@@ -2,7 +2,9 @@
 
 library(geiger)
 library(arbutus)
+library(ape)
 
+data(finch)
 geo <- finch$phy
 dat <- finch$data[,"wingL"]
 
