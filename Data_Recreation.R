@@ -34,3 +34,5 @@ multirand <- c(rphylo(32, 0.4, 0.2), rphylo(64, 0.4, 0.2),
 randplot <- plot(multirand, layout = 4)
 
 #Second step: divide selective regime
+
+#star trees were split between regime 1 and 2
