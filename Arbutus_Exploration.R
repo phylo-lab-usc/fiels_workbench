@@ -84,3 +84,40 @@ adequacy <- function(){
 }
 
 overall <- replicate(100, adequacy())
+
+#Aggregating and plotting data
+#[,1][[1]][[1]] is run 1, MV, entry 1
+
+agg_MV <- overall[1,1:100]
+agg_MA <- overall[2,1:100]
+agg_MVA <- overall[3,1:100]
+agg_OU <- overall[4,1:100]
+
+#Convert to dataframes to plot
+simdat_MV <- data.frame(t(data.frame(agg_MV)))
+row.names(simdat_MV) <- c(1:100)
+simdat_MA <- data.frame(t(data.frame(agg_MA)))
+row.names(simdat_MA) <- c(1:100)
+simdat_MVA <- data.frame(t(data.frame(agg_MVA)))
+row.names(simdat_MVA) <- c(1:100)
+simdat_OU <- data.frame(t(data.frame(agg_OU)))
+row.names(simdat_OU) <- c(1:100)
+
+#Editing data to plot on one graph
+plotdat_MV <- simdat_MV %>% mutate(model = "OUMV")
+plotdat_MA <- simdat_MA %>% mutate(model = "OUMA")
+plotdat_MVA <- simdat_MVA %>% mutate(model = "OUMVA")
+plotdat_OU <- simdat_OU %>% mutate(model = "OU")
+
+#joining the data
+joined_data <- full_join(plotdat_MV, plotdat_MA) %>%
+  full_join(plotdat_MVA) %>% full_join(plotdat_OU)
+
+#plot
+joined_data %>% group_by(model) %>% 
+  ggplot(aes(m.sig)) + geom_boxplot() + facet_wrap(~model, ncol = 1)
+
+#pivot to make more comprehensive graph
+pivot_data <- pivot_longer(joined_data, cols = c(-model), names_to = "test_statistic")
+
+pivot_data %>% ggplot(aes(x = value, fill = model)) + geom_boxplot() + facet_wrap(~test_statistic)
