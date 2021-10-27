@@ -80,7 +80,7 @@ adequacy <- function(){
   MA_adequacy <- arby(unit_MA)
   MVA_adequacy <- arby(unit_MVA)
   OU_adequacy <- arby(unit_OU)
-  list(MV_adequacy, MA_adequacy, MVA_adequacy, OU_adequacy)
+  list(MV_adequacy$p.values, MA_adequacy$p.values, MVA_adequacy$p.values, OU_adequacy$p.values)
 }
 
 overall <- replicate(100, adequacy())
