@@ -61,12 +61,26 @@ unit_MA <- make_unit_tree(fit_MA)
 unit_MVA <- make_unit_tree(fit_MVA)
 
 #Now run arbutus
-MV_adequacy <- arbutus(fit_MV)
-MA_adequacy <- arbutus(fit_MA)
-MVA_adequacy <- arbutus(fit_MVA)
-
+arby <- function(unit.tree) {
+  calc1 <- calculate_pic_stat(unit.tree)
+  sim.data <- simulate_char_unit(unit.tree)
+  calc2 <- calculate_pic_stat(sim.data)
+  compare_pic_stat(calc1, calc2)
+}
 
 #for comparison, will simulate a regular OU model and then calculate adequacy
 df_OU <- data.frame(rTraitCont(tr, model = "OU"))
 fit_OU <- fitContinuous(tr, df_OU, model = "OU")
-OU_adequacy <- arbutus(fit_OU)
+unit_OU <- make_unit_tree(fit_OU)
+OU_adequacy <- arby(unit_OU)
+
+#Adequacy simulations
+adequacy <- function(){
+  MV_adequacy <- arby(unit_MV)
+  MA_adequacy <- arby(unit_MA)
+  MVA_adequacy <- arby(unit_MVA)
+  OU_adequacy <- arby(unit_OU)
+  list(MV_adequacy, MA_adequacy, MVA_adequacy, OU_adequacy)
+}
+
+overall <- replicate(100, adequacy())
