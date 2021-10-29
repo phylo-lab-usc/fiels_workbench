@@ -37,3 +37,25 @@ char_list <- replicate(1000, sim_and_fit(tr))
 char_df2 <- fix_data_frame(t(data.frame(char_list)))
 char_df2$alpha <- unlist(char_df2$alpha)
 char_df2 %>% ggplot(aes(x = alpha)) + geom_boxplot() + theme_classic() + annotate("text", x = 2, y = -0.2, label = mean(char_df2$alpha))
+
+#Third test: Simulate using OUwie
+
+dat1 <- data.frame(tr$tip.label) %>% mutate(Reg = 1) %>% rename(Genus_species = tr.tip.label)
+tree_OUwie <- tr
+tree_OUwie$node.label <- rep(1, 127)
+
+
+sim_and_fit2 <- function (tree, dat) {
+  df <- OUwie.sim(tree, data = dat, alpha = c(1.0, 1.0), sigma.sq = c(0.9, 0.9), theta0 = 1, theta = c(1.0, 1.0))
+  df_fix <- df
+  row.names(df_fix) <- df_fix$Genus_species
+  df_fix <- df_fix %>% select(X)
+  fit <- fitContinuous(tree, df_fix, model = "OU")
+  fit$opt
+}
+
+char_list_v2 <- replicate(1000, sim_and_fit2(tree_OUwie, dat1))
+char_df2_v2 <- fix_data_frame(t(data.frame(char_list_v2)))
+char_df2_v2$alpha <- unlist(char_df2_v2$alpha)
+
+char_df2_v2 %>% ggplot(aes(x = alpha)) + geom_boxplot() + theme_classic() + annotate("text", x = 2, y = -0.2, label = mean(char_df2$alpha))
