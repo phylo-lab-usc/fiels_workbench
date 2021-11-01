@@ -7,6 +7,7 @@ library(ape)
 library(geiger)
 library(OUwie)
 library(broom)
+library(arbutus)
 
 #Now, simulate birth-death tree
 
@@ -59,3 +60,32 @@ char_df2_v2 <- fix_data_frame(t(data.frame(char_list_v2)))
 char_df2_v2$alpha <- unlist(char_df2_v2$alpha)
 
 char_df2_v2 %>% ggplot(aes(x = alpha)) + geom_boxplot() + theme_classic() + annotate("text", x = 2, y = -0.2, label = mean(char_df2$alpha))
+
+
+#Run adequacy tests on fits, this should be the standard to compare to other OU models
+#previously only got the opt data from sims, need the whole fit objects
+
+#Fit 1
+sim_and_fit_arbutus <- function (tree) {
+  df <- data.frame(rTraitCont(tree, model = "OU"))
+  fit <- fitContinuous(tr, df, model = "OU")
+  a <- arbutus(fit)
+  a
+}
+
+
+
+#Fit 2
+sim_and_fit_arbutus2 <- function (tree, dat) {
+  df <- OUwie.sim(tree, data = dat, alpha = c(1.0, 1.0), sigma.sq = c(0.9, 0.9), theta0 = 1, theta = c(1.0, 1.0))
+  df_fix <- df
+  row.names(df_fix) <- df_fix$Genus_species
+  df_fix <- df_fix %>% select(X)
+  fit <- fitContinuous(tree, df_fix, model = "OU")
+  a <- arbutus(fit)
+  a
+}
+
+#run the sims
+first_sim_adequacy <- replicate(1000, sim_and_fit_arbutus(tr))
+second_sim_adequacy <- replicate(1000, sim_and_fit_arbutus2(tr, dat1))
