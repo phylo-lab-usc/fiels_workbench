@@ -89,3 +89,38 @@ sim_and_fit_arbutus2 <- function (tree, dat) {
 #run the sims
 first_sim_adequacy <- replicate(1000, sim_and_fit_arbutus(tr))
 second_sim_adequacy <- replicate(1000, sim_and_fit_arbutus2(tr, dat1))
+
+#data transform function
+arbutus_transform <- function ( pval , len , tib) {
+  df <- t(data.frame(pval))
+  if(missing(tib)) tib = FALSE
+  ifelse(tib == TRUE, {
+    fin <- as_tibble(df)
+  }
+  , fin <- data.frame(df))
+  row.names(fin) <- c(1:len)
+  fin
+}
+
+#retrieve p values
+first_sim_pvals <- first_sim_adequacy[1,]
+first_sim_dfs <- arbutus_transform(first_sim_pvals, 1000)
+second_sim_dfs <- arbutus_transform(second_sim_adequacy[1,], 1000)
+
+#edit data to plot
+
+#first label each df
+first_sim_dfs_fuse <- first_sim_dfs %>% mutate(lab = "first")
+second_sim_dfs_fuse <- second_sim_dfs %>% mutate(lab = "second")
+
+#Now stack on top
+sims_df <- full_join(first_sim_dfs_fuse, second_sim_dfs_fuse)
+
+#Now pivot
+sims_df_piv <- sims_df %>% 
+  pivot_longer(cols = c(-lab), names_to = "test.stat")
+
+#now plot
+sims_df_piv %>% group_by(test.stat) %>% ggplot(aes(x = value, fill = lab)) + geom_boxplot() + facet_wrap(~test.stat)
+
+#shows that OUwie sim and rTraitCont work equally the same. Can now use this method with other models
