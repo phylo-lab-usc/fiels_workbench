@@ -61,7 +61,9 @@ MVA_df <- arbutus_transform(MVA_pvals, 1000) %>% mutate(model = "MVA")
 #fuse
 fuse_df <- full_join(OU_df, MV_df) %>% full_join(MA_df) %>% full_join(MVA_df)
 
-#pivot
+#pivot and plot
 data_plot <- fuse_df %>% pivot_longer(cols = c(-model), names_to = "test.stat") %>%
   ggplot(aes(x = value, fill = model)) + geom_boxplot() + facet_wrap(~test.stat)
+
+data_plot
 
