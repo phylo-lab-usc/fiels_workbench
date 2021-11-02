@@ -14,7 +14,8 @@ library(arbutus)
 
 tr <- sim.bdtree(n = 128)
 
-dat1 <- data.frame(tr$tip.label) %>% mutate(Reg = 1) %>% rename(Genus_species = tr.tip.label)
+dat1 <- data.frame(tr$tip.label) %>% mutate(Reg = c(rep(1, 64), rep(2, 64))) %>% rename(Genus_species = tr.tip.label)
+dat2 <- data.frame(tr$tip.label) %>% mutate(Reg = 1) %>% rename(Genus_species = tr.tip.label)
 
 #Use different trees for regular OU and OU variatns
 tree_OUwie <- tr
@@ -44,7 +45,7 @@ sim_and_fit_arbutus2 <- function (tree, dat, model) {
 }
 
 #run the sims
-OU_adequacy <- replicate(1000, sim_and_fit_arbutus2(tree_OU, dat1, model = "OU"))
+OU_adequacy <- replicate(1000, sim_and_fit_arbutus2(tree_OU, dat2, model = "OU"))
 MV_adequacy <- replicate(1000, sim_and_fit_arbutus2(tree_OUwie, dat1, model = "MV"))
 MA_adequacy <- replicate(1000, sim_and_fit_arbutus2(tree_OUwie, dat1, model = "MA"))
 MVA_adequacy <- replicate(1000, sim_and_fit_arbutus2(tree_OUwie, dat1, model = "MVA"))
