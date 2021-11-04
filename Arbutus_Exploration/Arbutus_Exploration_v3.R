@@ -52,11 +52,11 @@ sim_and_fit_arbutus2 <- function (tree, dat, model) {
 }
 
 #run the sims
-OU_adequacy <- replicate(500, sim_and_fit_arbutus2(tree_OU, dat2, model = "OU"))
-MV_adequacy <- replicate(500, sim_and_fit_arbutus2(tree_OUwie, dat1, model = "MV"))
-MA_adequacy <- replicate(500, sim_and_fit_arbutus2(tree_OUwie, dat1, model = "MA"))
-MVA_adequacy <- replicate(500, sim_and_fit_arbutus2(tree_OUwie, dat1, model = "MVA"))
-BM_adequacy <- replicate(500, sim_and_fit_arbutus2(tree_OU, dat2, model = "BM"))
+OU_adequacy <- replicate(1000, sim_and_fit_arbutus2(tree_OU, dat2, model = "OU"))
+MV_adequacy <- replicate(1000, sim_and_fit_arbutus2(tree_OUwie, dat1, model = "MV"))
+MA_adequacy <- replicate(1000, sim_and_fit_arbutus2(tree_OUwie, dat1, model = "MA"))
+MVA_adequacy <- replicate(1000, sim_and_fit_arbutus2(tree_OUwie, dat1, model = "MVA"))
+BM_adequacy <- replicate(1000, sim_and_fit_arbutus2(tree_OU, dat2, model = "BM"))
 
 #retrieve pvals
 OU_pvals <- OU_adequacy[1,]
@@ -68,11 +68,11 @@ BM_pvals <- BM_adequacy[1,]
 #arbutus_transform() from custom_functions.R
 
 #transform
-OU_df <- arbutus_transform(OU_pvals, 500) %>% mutate(model = "OU")
-MV_df <- arbutus_transform(MV_pvals, 500) %>% mutate(model = "MV")
-MA_df <- arbutus_transform(MA_pvals, 500) %>% mutate(model = "MA")
-MVA_df <- arbutus_transform(MVA_pvals, 500) %>% mutate(model = "MVA")
-BM_df <- arbutus_transform(BM_pvals, 500) %>% mutate(model = "BM")
+OU_df <- arbutus_transform(OU_pvals, 1000) %>% mutate(model = "OU")
+MV_df <- arbutus_transform(MV_pvals, 1000) %>% mutate(model = "MV")
+MA_df <- arbutus_transform(MA_pvals, 1000) %>% mutate(model = "MA")
+MVA_df <- arbutus_transform(MVA_pvals, 1000) %>% mutate(model = "MVA")
+BM_df <- arbutus_transform(BM_pvals, 1000) %>% mutate(model = "BM")
 
 #fuse
 fuse_df <- full_join(OU_df, MV_df) %>% full_join(MA_df) %>% full_join(MVA_df) %>% full_join(BM_df)
