@@ -19,7 +19,7 @@ tr <- sim.bdtree(n = 128)
 dat1 <- data.frame(tr$tip.label) %>% mutate(Reg = c(rep(1, 64), rep(2, 64))) %>% rename(Genus_species = tr.tip.label)
 dat2 <- data.frame(tr$tip.label) %>% mutate(Reg = 1) %>% rename(Genus_species = tr.tip.label)
 
-#Use different trees for regular OU and OU variatns
+#Use different trees for regular OU and OU variants
 tree_OUwie <- tr
 tree_OUwie$node.label <- c(rep(1, 64), rep(2, 63))
 
