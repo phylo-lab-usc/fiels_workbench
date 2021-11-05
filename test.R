@@ -29,8 +29,8 @@ rescaled1 <- rescale(test.tree, model = "EB", a = 1)
 rescaledhalf <- rescale(test.tree, model = "EB", a = 0.5)
 rescaled2 <- rescale(test.tree, model = "EB", a = 2)
 
-sim_and_fit_EB <- function (tree, dat) {
-  df <- OUwie.sim(tree, dat, alpha = c(1e-10, 1e-10), sigma.sq = c(0.45, 0.45), theta0 = 1.0, theta = c(0, 0))
+sim_and_fit_EB <- function (tree, rescaled, dat) {
+  df <- OUwie.sim(rescaled, dat, alpha = c(1e-10, 1e-10), sigma.sq = c(0.45, 0.45), theta0 = 1.0, theta = c(0, 0))
   df_fix <- df
   row.names(df_fix) <- df_fix$Genus_species
   df_fix <- df_fix %>% select(X)
@@ -40,9 +40,9 @@ sim_and_fit_EB <- function (tree, dat) {
 }
 
 #run simulations
-BMhalf <- replicate(1000, sim_and_fit_EB(rescaledhalf, data))
-BM1 <- replicate(1000, sim_and_fit_EB(rescaled1, data))
-BM2 <- replicate(1000, sim_and_fit_EB(rescaled2, data))
+BMhalf <- replicate(1000, sim_and_fit_EB(test.tree, rescaledhalf, data))
+BM1 <- replicate(1000, sim_and_fit_EB(test.tree, rescaled1, data))
+BM2 <- replicate(1000, sim_and_fit_EB(test.tree, rescaled2, data))
 
 #retrieve pvals
 BMhalf_pvals <- BMhalf[1,]
