@@ -63,3 +63,5 @@ fuse_df <- full_join(BMhalf_df, BM1_df) %>% full_join(BM2_df)
 #pivot and plot
 fuse_df %>% pivot_longer(cols = c(-alpha), names_to = "test.stat") %>%
   ggplot(aes(y = value, x = alpha, fill = (alpha))) + geom_violin() + geom_boxplot(width = 0.5) + facet_wrap(~test.stat) + theme_bw()
+
+saveRDS(fuse_df, "Arbutus_Exploration/EB_data")
