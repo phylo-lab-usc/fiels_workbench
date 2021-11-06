@@ -34,6 +34,16 @@ sim_BM <- function (tree, rescaled, dat) {
   fit$opt
 }
 
+#Sim and fit to EB
+sim_BM <- function (tree, rescaled, dat) {
+  df <- OUwie.sim(rescaled, dat, alpha = c(1e-10, 1e-10), sigma.sq = c(0.45, 0.45), theta0 = 1.0, theta = c(0, 0))
+  df_fix <- df
+  row.names(df_fix) <- df_fix$Genus_species
+  df_fix <- df_fix %>% select(X)
+  fit <- fitContinuous(tree, df_fix, model = "EB")
+  fit$opt
+}
+
 #Run the simulations fit to OU
 OU_ctrl <- replicate(500, sim_OU(test.tree, test.tree, data))
 OU_half <- replicate(500, sim_OU(test.tree, rescaledhalf, data))
@@ -45,6 +55,11 @@ BM_ctrl <- replicate(500, sim_BM(test.tree, test.tree, data))
 BM_half <- replicate(500, sim_BM(test.tree, rescaledhalf, data))
 BM_1 <- replicate(500, sim_BM(test.tree, rescaled1, data))
 BM_2 <- replicate(500, sim_BM(test.tree, rescaled2, data))
+
+#Run the simulations fit to EB
+EB_half <- replicate(500, sim_EB(rescaledhalf, rescaledhalf, data))
+EB_1 <- replicate(500, sim_EB(rescaled1, rescaled1, data))
+EB_2 <- replicate(500, sim_EB(rescaled2, rescaled2, data))
 
 #Function to fix data
 fit_transform <- function ( fit , len , tib) {
@@ -70,10 +85,16 @@ BM_half_sig <- fit_transform(BM_half, 500) %>% mutate(alpha = "half")
 BM_1_sig <- fit_transform(BM_1, 500) %>% mutate(alpha = "1")
 BM_2_sig <- fit_transform(BM_2, 500) %>% mutate(alpha = "2")
 
+EB_half_sig <- fit_transform(EB_half, 500) %>% mutate(alpha = "half")
+EB_1_sig <- fit_transform(EB_1, 500) %>% mutate(alpha = "1")
+EB_2_sig <- fit_transform(EB_2, 500) %>% mutate(alpha = "2")
+
 #fuse
 OU_df <- full_join(OU_ctrl_sig, OU_half_sig) %>% full_join(OU_1_sig) %>% full_join(OU_2_sig)
 BM_df <- full_join(BM_ctrl_sig, BM_half_sig) %>% full_join(BM_1_sig) %>% full_join(BM_2_sig)
+EB_df <- EB_half_sig %>% full_join(EB_1_sig) %>% full_join(EB_2_sig)
 
 #save data for later
 saveRDS(OU_df, paste0(here(), "/Arbutus_Exploration/RDSfiles/EB_fit_to_OU"))
 saveRDS(BM_df, paste0(here(), "/Arbutus_Exploration/RDSfiles/EB_fit_to_BM"))
+saveRDS(EB_df, paste0(here(), "/Arbutus_Exploration/RDSfiles/EB_fit_to_EB"))
