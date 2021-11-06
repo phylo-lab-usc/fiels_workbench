@@ -35,7 +35,7 @@ sim_BM <- function (tree, rescaled, dat) {
 }
 
 #Sim and fit to EB
-sim_BM <- function (tree, rescaled, dat) {
+sim_EB <- function (tree, rescaled, dat) {
   df <- OUwie.sim(rescaled, dat, alpha = c(1e-10, 1e-10), sigma.sq = c(0.45, 0.45), theta0 = 1.0, theta = c(0, 0))
   df_fix <- df
   row.names(df_fix) <- df_fix$Genus_species
@@ -57,9 +57,9 @@ BM_1 <- replicate(500, sim_BM(test.tree, rescaled1, data))
 BM_2 <- replicate(500, sim_BM(test.tree, rescaled2, data))
 
 #Run the simulations fit to EB
-EB_half <- replicate(500, sim_EB(rescaledhalf, rescaledhalf, data))
-EB_1 <- replicate(500, sim_EB(rescaled1, rescaled1, data))
-EB_2 <- replicate(500, sim_EB(rescaled2, rescaled2, data))
+EB_half <- replicate(500, sim_EB(rescaledhalf, data))
+EB_1 <- replicate(500, sim_EB(rescaled1, data))
+EB_2 <- replicate(500, sim_EB(rescaled2, data))
 
 #Function to fix data
 fit_transform <- function ( fit , len , tib) {
