@@ -95,6 +95,6 @@ BM_df <- full_join(BM_ctrl_sig, BM_half_sig) %>% full_join(BM_1_sig) %>% full_jo
 EB_df <- EB_half_sig %>% full_join(EB_1_sig) %>% full_join(EB_2_sig)
 
 #save data for later
-saveRDS(OU_df, paste0(here(), "EB_fit_to_OU"))
-saveRDS(BM_df, paste0(here(), "EB_fit_to_BM"))
-saveRDS(EB_df, paste0(here(), "EB_fit_to_EB"))
+saveRDS(OU_df, paste0(here(), "/Arbutus_Exploration/RDSfiles/EB_fit_to_OU"))
+saveRDS(BM_df, paste0(here(), "/Arbutus_Exploration/RDSfiles/EB_fit_to_BM"))
+saveRDS(EB_df, paste0(here(), "/Arbutus_Exploration/RDSfiles/EB_fit_to_EB"))
