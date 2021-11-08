@@ -26,11 +26,12 @@ generated using a pure birth model via a function from the geiger
 package, a package that improves and adds upon the ape package; both of
 these tools are used for the analysis and handling of phylogenetic data.
 
-Four models were tested; single rate and single optima OU (labeled as
-OU), multirate OU (OUMV), multioptima OU (OUMA), and multirate
-multioptima OU (OUMVA). 1000 sets of character data were simulated for
-each model and measured for model adequacy via arbutus. These
-calculations were carried out in Arbutus\_Exploration\_v2.R script.
+Five models were tested; single rate BM, single rate and single optima
+OU (labeled as OU), multirate OU (OUMV), multioptima OU (OUMA), and
+multirate multioptima OU (OUMVA). 1000 sets of character data were
+simulated for each model and measured for model adequacy via arbutus.
+These calculations were carried out in Arbutus\_Exploration\_v2.R
+script.
 
 ## Results
 
@@ -43,7 +44,7 @@ represents different potential violations of the data to a specific
 model. Each of the models listed are the generating models, which were
 then fit to a regular OU process.
 
-![](Arbutus_Exploration/Model_Pvals_Violin.png "P value distribution of test statistics")
+![](Arbutus_Exploration/T_statistic_pvals_BM.png "P value distribution of test statistics")
 
 ### C.var
 
@@ -57,15 +58,15 @@ is not accurate.
 
 This is the D statistic, which measures deviations from normality.
 Because OU data is essentially random walk, it makes sense that all
-models have approximately equal p-values for this statistic. An early
-burst model would likely show low p-values.
+models have approximately equal p-values for this statistic.
 
 ### m.sig
 
 This is the mean of the squared contrasts and measures if overall
 evolutionary rate is over or underestimated. Because each is essentially
 an OU process, violations for this statistic are not expected and not
-observed.
+observed. It would be interesting to see this statistic when the
+parameter estimates deviate from the actual parameter values.
 
 ### s.asr
 
@@ -86,12 +87,11 @@ statistic, with MVA being the best.
 This statistic measures if contrasts deviate from expected based on
 branch lengths. So if more/less evolution occured on a shorter tree than
 expected, we would see a violation. It seems that only the OU data fit
-the OU model well from this measurement. I would like to see if BM and
-EB processes violate this statistic as well.
+the OU model well from this measurement.
 
 ## Future exploration
 
-From examining the test statistics, I would like to add Early Burst and
-Brownian Motion processes to this analysis. This would deepen my
-understanding of what the test statistics measure and clarify how a
-model can be inadequate for a specific dataset.
+From examining the test statistics, I would like to add Early Burst
+processes to this analysis. This would deepen my understanding of what
+the test statistics measure and clarify how a model can be inadequate
+for a specific dataset.
