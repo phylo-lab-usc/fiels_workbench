@@ -86,3 +86,5 @@ data_plot
 fuse_df %>% pivot_longer(cols = c(-model), names_to = "test.stat") %>%
   ggplot(aes(y = value, x = model, fill = (model))) + geom_violin() + geom_boxplot(width = 0.5) + facet_wrap(~test.stat) + theme_bw()
 
+
+saveRDS(fuse_df,"./Arbutus_Exploration/RDSfiles/Exploration3_data" )
