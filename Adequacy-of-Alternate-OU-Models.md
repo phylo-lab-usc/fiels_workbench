@@ -128,4 +128,8 @@ each alpha value).
 ![](Arbutus_Exploration/EB_tests/problem_with_fit.png) As shown in the
 graph above, an alpha value of 0 was estimated for alphas of each of the
 three values! This suggests issues with fitting of the data to the
-rescaled trees.
+rescaled trees. Other parameters from the fit are as shown below.
+
+![](Arbutus_Exploration/EB_tests/EB_fit_plot.png) As shown in the plot
+above, alpha values for the scaled tree affect estimates for rate, as
+well as AIC values.
