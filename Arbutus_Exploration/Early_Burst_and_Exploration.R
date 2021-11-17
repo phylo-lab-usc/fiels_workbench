@@ -1,5 +1,10 @@
 #Comparing and plotting Arbutus exploration with Early Bust model exploration
 
+library(tidyverse)
+library(geiger)
+library(OUwie)
+
+
 #Dataset loading for violin plots
 EB_violin <- readRDS("Arbutus_Exploration/RDSfiles/EB_data")
 others_violin <- readRDS("Arbutus_Exploration/RDSfiles/Exploration3_data")
@@ -20,7 +25,9 @@ plot_df %>% pivot_longer(cols = c(-model), names_to = "test.stat") %>%
 
 #Now to show Early Burst fit
 EB_EB <- readRDS("Arbutus_Exploration/RDSfiles/EB_fit_to_EB")
-#Values represent alpha values calculated by fitContinuous
 
-EB_EB %>% ggplot(aes(x = df, fill = alpha)) + geom_histogram()
+#Change value to not a list.
+a <- EB_EB %>% select(-c(method, k)) %>% 
+  pivot_longer(cols = c(-alpha), names_to = "param") #%>%
+  ggplot(aes(x = value)) + geom_boxplot() + theme_classic()
 
