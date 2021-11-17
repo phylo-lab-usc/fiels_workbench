@@ -44,7 +44,7 @@ represents different potential violations of the data to a specific
 model. Each of the models listed are the generating models, which were
 then fit to a regular OU process.
 
-![](Arbutus_Exploration/T_statistic_pvals_BM.png "P value distribution of test statistics")
+![](Arbutus_Exploration/t_statistics_all_models.png "P value distribution of test statistics")
 
 ### C.var
 
@@ -89,9 +89,43 @@ branch lengths. So if more/less evolution occured on a shorter tree than
 expected, we would see a violation. It seems that only the OU data fit
 the OU model well from this measurement.
 
-## Future exploration
+## Future exploration of Early Burst
 
-From examining the test statistics, I would like to add Early Burst
-processes to this analysis. This would deepen my understanding of what
-the test statistics measure and clarify how a model can be inadequate
-for a specific dataset.
+From examining the test statistics, I would like to re-analyze the Early
+Burst simulation data further. So far, I have looked at how Early
+Burst’s alpha parameter influences these t-statistics. The results are
+shown below.
+
+![](Arbutus_Exploration/EB_violin_plot.png "Varying the alpha parameter in Early Burst simulations")
+As shown in the plot, changing the alpha parameter does not seem to have
+an effect on the t-statistics. Also, as in the composite violin plot,
+Early Burst models seem to very closely resemble Brownian Motion violin
+plots, even for s.hgt, which should account for the rate varying over
+time, and thus, the Early Burst Model. This may be an artifact from how
+the EB simulations are run, and so I will analyze that next.
+
+## EB Simulations
+
+Simulating Early Burst models requires the rescaling of a tree, followed
+by fitting to a Brownian Motion model. The rescaling should account for
+the “slowing down” of the evolutionary rate. I first simulated a
+pure-birth phylogenetic tree of 128 species, followed by rescaling the
+tree with different alpha parameters. The alpha parameter represents the
+strength of the EB process, i.e., how much the evolutionary rate slows
+down. The original tree and the scaled trees are shown below.
+
+![](Arbutus_Exploration/EB_tests/phylo_trees.png "Phylogenetic trees")
+Top left represents the original tree, while top right, bottom left, and
+bottom right are an alpha of half, one, and two respectively.
+
+Tree rescaling seems to be working correctly as increasing alpha causes
+the tree to become increasingly lengthened.
+
+I then used fitContinuous() from the geiger package to examine estimated
+parameters and compare to those used to generate the data. The graph
+below shows the estimate for the alpha parameter (500 replicates for
+each alpha value).
+![](Arbutus_Exploration/EB_tests/problem_with_fit.png) As shown in the
+graph above, an alpha value of 0 was estimated for alphas of each of the
+three values! This suggests issues with fitting of the data to the
+rescaled trees.

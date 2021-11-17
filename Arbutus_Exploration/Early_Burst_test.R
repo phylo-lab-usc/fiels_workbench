@@ -14,6 +14,9 @@ rescaled1 <- rescale(test.tree, model = "EB", a = 1)
 rescaledhalf <- rescale(test.tree, model = "EB", a = 0.5)
 rescaled2 <- rescale(test.tree, model = "EB", a = 2)
 
+#Form multiPhylo object to plot trees
+treeplot <- c(test.tree, rescaledhalf, rescaled1, rescaled2)
+
 #Sim and fit to OU
 sim_OU <- function (tree, rescaled, dat) {
 df <- OUwie.sim(rescaled, dat, alpha = c(1e-10, 1e-10), sigma.sq = c(0.45, 0.45), theta0 = 1.0, theta = c(0, 0))
@@ -63,7 +66,7 @@ EB_2 <- replicate(500, sim_EB(test.tree, rescaled2, data))
 
 #Function to fix data
 fit_transform <- function ( fit , len , tib) {
-  df <- t(data.frame(fit[1,]))
+  df <- t(data.frame(fit))
   if(missing(tib)) tib = FALSE
   ifelse(tib == TRUE, {
     fin <- as_tibble(df)
@@ -98,3 +101,4 @@ EB_df <- EB_half_sig %>% full_join(EB_1_sig) %>% full_join(EB_2_sig)
 saveRDS(OU_df, paste0(here(), "/Arbutus_Exploration/RDSfiles/EB_fit_to_OU"))
 saveRDS(BM_df, paste0(here(), "/Arbutus_Exploration/RDSfiles/EB_fit_to_BM"))
 saveRDS(EB_df, paste0(here(), "/Arbutus_Exploration/RDSfiles/EB_fit_to_EB"))
+saveRDS(treeplot, "Arbutus_Exploration/EB_tests/tree_plot")

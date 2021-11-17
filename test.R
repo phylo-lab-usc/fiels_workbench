@@ -5,6 +5,7 @@ library(geiger)
 library(arbutus)
 library(ape)
 library(OUwie)
+library(here)
 
 #data(finch)
 #geo <- finch$phy
@@ -64,4 +65,5 @@ fuse_df <- full_join(BMhalf_df, BM1_df) %>% full_join(BM2_df)
 fuse_df %>% pivot_longer(cols = c(-alpha), names_to = "test.stat") %>%
   ggplot(aes(y = value, x = alpha, fill = (alpha))) + geom_violin() + geom_boxplot(width = 0.5) + facet_wrap(~test.stat) + theme_bw()
 
-saveRDS(fuse_df, "Arbutus_Exploration/EB_data")
+saveRDS(fuse_df, "Arbutus_Exploration/RDSfiles/EB_data")
+fuse_df <- readRDS(paste0(here(), "/Arbutus_Exploration/RDSfiles/EB_data"))
