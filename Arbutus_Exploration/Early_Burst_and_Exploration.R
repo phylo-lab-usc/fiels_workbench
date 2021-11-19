@@ -45,4 +45,3 @@ EB_OU %>% select(-c(method, k)) %>%
   pivot_longer(cols = c(-alpha), names_to = "param") %>%
   mutate(value = unlist(value)) %>%
   ggplot(aes(x = value, fill = alpha)) + geom_boxplot() + facet_wrap(~param, scales = "free") + theme_classic() 
-
