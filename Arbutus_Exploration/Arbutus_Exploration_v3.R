@@ -109,4 +109,4 @@ violin <- fuse_df %>% pivot_longer(cols = c(-model), names_to = "test.stat") %>%
 
 saveRDS(fuse_df,"./Arbutus_Exploration/RDSfiles/Exploration3_data" )
 
-ggsave("Arbutus_Exploration/violin_all_models", plot = violin)
+ggsave("Arbutus_Exploration/violin_all_models.png", plot = violin)
