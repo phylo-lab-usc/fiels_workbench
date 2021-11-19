@@ -10,9 +10,9 @@ data <- data.frame(test.tree$tip.label) %>% mutate(Reg = 1) %>% rename(Genus_spe
 test.tree$node.label <- rep(1, 127)
 
 #testing parameter a
-rescaled1 <- rescale(test.tree, model = "EB", a = 1)
-rescaledhalf <- rescale(test.tree, model = "EB", a = 0.5)
-rescaled2 <- rescale(test.tree, model = "EB", a = 2)
+rescaled1 <- rescale(test.tree, model = "EB", a = -1)
+rescaledhalf <- rescale(test.tree, model = "EB", a = -0.5)
+rescaled2 <- rescale(test.tree, model = "EB", a = -2)
 
 #Form multiPhylo object to plot trees
 treeplot <- c(test.tree, rescaledhalf, rescaled1, rescaled2)
