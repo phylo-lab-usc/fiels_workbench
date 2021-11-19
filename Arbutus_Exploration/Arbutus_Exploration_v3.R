@@ -104,13 +104,9 @@ EB_df <- arbutus_transform(EB_pvals, 1000) %>% mutate(model = "EB")
 fuse_df <- full_join(OU_df, MV_df) %>% full_join(MA_df) %>% full_join(MVA_df) %>% full_join(BM_df) %>% full_join(EB_df)
 
 #pivot and plot
-data_plot <- fuse_df %>% pivot_longer(cols = c(-model), names_to = "test.stat") %>%
-  ggplot(aes(x = value, fill = model)) + geom_boxplot() + facet_wrap(~test.stat)
-
-data_plot
-
-fuse_df %>% pivot_longer(cols = c(-model), names_to = "test.stat") %>%
+violin <- fuse_df %>% pivot_longer(cols = c(-model), names_to = "test.stat") %>%
   ggplot(aes(y = value, x = model, fill = (model))) + geom_violin() + geom_boxplot(width = 0.5) + facet_wrap(~test.stat) + theme_bw()
 
-
 saveRDS(fuse_df,"./Arbutus_Exploration/RDSfiles/Exploration3_data" )
+
+ggsave("Arbutus_Exploration/violin_all_models", plot = violin)
