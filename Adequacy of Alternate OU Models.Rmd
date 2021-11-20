@@ -52,25 +52,27 @@ represents different potential violations of the data to a specific
 model. Each of the models listed are the generating models, which were
 then fit to a regular OU process.
 
-![](Arbutus_Exploration/t_statistics_all_models.png "P value distribution of test statistics")
+![](Arbutus_Exploration/violin_all_models.png "P value distribution of test statistics")
 
 ### C.var
 c.var, or the coefficient of variation, is calculated from the absolute
 value of the contrasts. It accounts for rate heterogeneity. In the figure
 above, it is lowest in OUMV and OUMVA, which makes sense, because these two
 models have multiple rates, and therefore a regular OU model is not accurate.
+Notably, it is also very low for EB, which makes sense because the evolutionary
+rate is slowing down over time; so the rate is constantly non-homogenous.
 
 ### d.cdf
 This is the D statistic, which measures deviations from normality. Because
 OU data is essentially random walk, it makes sense that all models have 
-approximately equal p-values for this statistic.  
+approximately equal p-values for this statistic. Interestingly, EB seems to deviate from normality. It would be interesting to examine why this is.   
 
 ### m.sig
 This is the mean of the squared contrasts and measures if overall evolutionary
 rate is over or underestimated. Because each is essentially an OU process,
 violations for this statistic are not expected and not observed. It would be
 interesting to see this statistic when the parameter estimates deviate from
-the actual parameter values.
+the actual parameter values. Another interesting area would be to look into why they are all clustered tightly around high values. One would expect at least 5% of the p-values to be below 0.05. 
 
 ### s.asr
 This calculations takes ancestral states into account to measure rate variation
@@ -79,31 +81,18 @@ it follows that these two datasets do not fit the single rate OU model. OUMA and
 regular OU do fit the model.
 
 ### s.hgt
-This statistic measures trait variation relative to time. This statistic would
-be better evaluated when compared to an Early Burst model. It seems like all
+This statistic measures trait variation relative to time. It seems like all
 three alternative OU models are not adequate in this statistic, with MVA being
-the best.
+the best. Early Burst shows significant deviation for this statistic, which makes sense, considering the slowing down of evolutionary rate over time in the model.
 
 ### s.var
 This statistic measures if contrasts deviate from expected based on branch 
-lengths. So if more/less evolution occured on a shorter tree than expected,
+lengths. So if more/less evolution occurred on a shorter tree than expected,
 we would see a violation. It seems that only the OU data fit the OU model 
 well from this measurement.  
 
-## Future exploration of Early Burst
-From examining the test statistics, I would like to re-analyze the Early Burst
-simulation data further. So far, I have looked at how Early Burst's alpha parameter
-influences these t-statistics. The results are shown below. 
-
-![](Arbutus_Exploration/EB_violin_plot.png "Varying the alpha parameter in Early Burst simulations")
-As shown in the plot, changing the alpha parameter does not seem to have an 
-effect on the t-statistics. Also, as in the composite violin plot, Early Burst
-models seem to very closely resemble Brownian Motion violin plots, even for s.hgt, 
-which should account for the rate varying over time, and thus, the Early Burst Model.
-This may be an artifact from how the EB simulations are run, and so I will analyze
-that next. 
-
 ## EB Simulations
+
 Simulating Early Burst models requires the rescaling of a tree, followed by fitting
 to a Brownian Motion model. The rescaling should account for the "slowing down"
 of the evolutionary rate. I first simulated a pure-birth phylogenetic tree of 128 species,
@@ -111,20 +100,17 @@ followed by rescaling the tree with different alpha parameters. The alpha parame
 represents the strength of the EB process, i.e., how much the evolutionary rate
 slows down. The original tree and the scaled trees are shown below. 
 
-![](Arbutus_Exploration/EB_tests/phylo_trees.png "Phylogenetic trees")
+![](Arbutus_Exploration/EB_tests/treeplot.png "Phylogenetic trees")
 Top left represents the original tree, while top right, bottom left, and bottom
 right are an alpha of half, one, and two respectively. 
 
-Tree rescaling seems to be working correctly as increasing alpha causes the tree
-to become increasingly lengthened. 
+After using negative values for alpha, tree rescaling seems to be working correctly as increasing alpha causes the tree to become increasingly lengthened. 
 
-I then used fitContinuous() from the geiger package to examine estimated parameters
-and compare to those used to generate the data. The graph below shows the estimate
-for the alpha parameter (500 replicates for each alpha value).
-![](Arbutus_Exploration/EB_tests/problem_with_fit.png)
-As shown in the graph above, an alpha value of 0 was estimated for alphas of 
-each of the three values! This suggests issues with fitting of the data to the
-rescaled trees. Other parameters from the fit are as shown below. 
+I then used fitContinuous() to test if correct alpha parameters were being estimated. Results of the fit are as shown below.
 
-![](Arbutus_Exploration/EB_tests/EB_fit_plot.png)
-As shown in the plot above, alpha values for the scaled tree affect estimates for rate, as well as AIC values. 
+![](Arbutus_Exploration/EB_tests/EB_fit_parameters.png)
+As shown in the plot above, alpha values cluster around the values used to generate the trees. This means the rescaling is working correctly. 
+
+## OU model parameter tests
+
+I would also like to see what parameters in an OU model affect test statistics generated by arbutus. I will vary alpha, sigma, and theta, as well as test multi-regime OU models. 
