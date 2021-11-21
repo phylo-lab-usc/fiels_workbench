@@ -123,12 +123,21 @@ sigma_df <- full_join(sigma.sm_df, sigma.med_df) %>% full_join(sigma.lar_df) %>%
 theta_df <- full_join(theta.sm_df, theta.med_df) %>% full_join(theta.lar_df) %>%
   full_join(theta.smdiff_df) %>% full_join(theta.meddiff_df) %>% full_join(theta.lardiff_df)
 
+#save data
+saveRDS(alpha_df, "Arbutus_Exploration/RDSfiles/OU_alpha_data")
+saveRDS(sigma_df, "Arbutus_Exploration/RDSfiles/OU_sigma_data")
+saveRDS(theta_df, "Arbutus_Exploration/RDSfiles/OU_theta_data")
+
 
 #pivot and plot
 alpha_df %>% pivot_longer(cols = c(-size), names_to = "test.stat") %>%
   ggplot(aes(y = value, x = size, fill = (size))) + geom_violin() + geom_boxplot(width = 0.5) + facet_wrap(~test.stat) + theme_bw()
+ggsave("Arbutus_Exploration/OU_alpha_plot.png")
+
 sigma_df %>% pivot_longer(cols = c(-size), names_to = "test.stat") %>%
   ggplot(aes(y = value, x = size, fill = (size))) + geom_violin() + geom_boxplot(width = 0.5) + facet_wrap(~test.stat) + theme_bw()
+ggsave("Arbutus_Exploration/OU_sigma_plot.png")
+
 theta_df %>% pivot_longer(cols = c(-size), names_to = "test.stat") %>%
   ggplot(aes(y = value, x = size, fill = (size))) + geom_violin() + geom_boxplot(width = 0.5) + facet_wrap(~test.stat) + theme_bw()
-
+ggsave("Arbutus_Exploration/OU_theta_plot.png")
