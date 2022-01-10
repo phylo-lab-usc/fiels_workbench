@@ -107,6 +107,11 @@ fuse_df <- full_join(OU_df, MV_df) %>% full_join(MA_df) %>% full_join(MVA_df) %>
 violin <- fuse_df %>% pivot_longer(cols = c(-model), names_to = "test.stat") %>%
   ggplot(aes(y = value, x = model, fill = (model))) + geom_violin() + geom_boxplot(width = 0.5) + facet_wrap(~test.stat) + theme_bw()
 
-saveRDS(fuse_df,"./Arbutus_Exploration/RDSfiles/Exploration3_data" )
+saveRDS(fuse_df,"./Arbutus_Exploration/RDSfiles/Exploration3_data")
 
 ggsave("Arbutus_Exploration/violin_all_models.png", plot = violin)
+
+#reload data
+expldata <- readRDS("./Arbutus_Exploration/RDSfiles/Exploration3_data")
+#example plot for just cvar
+cvarplot <- expldata %>% select(c.var, model) %>% ggplot(aes(x = c.var)) + geom_histogram() + facet_wrap(~model) + theme_bw() 
