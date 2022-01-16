@@ -1,0 +1,9 @@
+Homo sapiens
+Pan troglodytes
+Gorilla gorilla
+Pongo abelii
+Macaca mulatta
+Mus musculus
+Monodelphis domestica
+Ornithorhynchus anatinus
+Gallus gallus

@@ -1,0 +1,5 @@
+In this directory, I will be analyzing the gene expression data using the known species phylogeny, which I will build from gene sequence. 
+
+The species are: Human Chimpanzee Gorilla Orangutan Macaque Mouse Opossum Platypus Chicken
+
+I will use a species tree provided by TimeTree http://www.timetree.org/
