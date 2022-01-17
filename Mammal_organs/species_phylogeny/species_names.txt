@@ -1,7 +1,8 @@
 Homo sapiens
 Pan troglodytes
+Pan paniscus
 Gorilla gorilla
-Pongo abelii
+Pongo pygmaeus
 Macaca mulatta
 Mus musculus
 Monodelphis domestica
