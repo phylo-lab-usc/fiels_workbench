@@ -111,18 +111,9 @@ ts_exp <- format_expr_data(ts_avg_dat)
 runFC <- function (dat){
 fitResults <- vector(mode = "list", length = ncol(dat))
 for(j in 1:ncol(dat)){
-  tmp <- cleaned$phy
-  todrop <- c()
-  for(i in 1:nrow(dat)){
-    if(is.na(dat[[i,j]])){
-      todrop <- append(todrop, rownames(dat)[i])
-    }
-  }
-  tmp <- drop.tip(tmp, todrop)
-  trimmed <- treedata(tmp, dat[,j], sort = TRUE)
-  fitBM <- fitContinuous(trimmed$phy, trimmed$data, model = "BM")
-  fitOU <- fitContinuous(trimmed$phy, trimmed$data, model = "OU")
-  fitEB <- fitContinuous(trimmed$phy, trimmed$data, model = "EB")
+   fitBM <- fitContinuous(species_phylo, dat[j], model = "BM")
+  fitOU <- fitContinuous(species_phylo, dat[j], model = "OU")
+  fitEB <- fitContinuous(species_phylo, dat[j], model = "EB")
   aic <- c(fitBM$opt[["aic"]], fitOU$opt[["aic"]], fitEB$opt[["aic"]])
   fit <- ifelse(min(aic) == aic[1], list(c(fitBM, model = "BM")), 
                 ifelse(min(aic) == aic[2], list(c(fitOU, model = "OU")), 

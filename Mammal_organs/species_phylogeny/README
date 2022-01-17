@@ -3,3 +3,5 @@ In this directory, I will be analyzing the gene expression data using the known 
 The species are: Human Chimpanzee Gorilla Orangutan Macaque Mouse Opossum Platypus Chicken
 
 I will use a species tree provided by TimeTree http://www.timetree.org/
+
+Note: First run I averaged RPKM values, which may not be advised. Will try to with each of the values separately. (Jan 16, 2022)
