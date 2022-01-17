@@ -107,4 +107,130 @@ lv_exp <- format_expr_data(lv_avg_dat)
 ts_exp <- format_expr_data(ts_avg_dat)
 
 #Running fitcontinuous
-fitContinuous(species_phylo, br_exp[1], model = "BM")
+
+runFC <- function (dat){
+fitResults <- vector(mode = "list", length = ncol(dat))
+for(j in 1:ncol(dat)){
+  tmp <- cleaned$phy
+  todrop <- c()
+  for(i in 1:nrow(dat)){
+    if(is.na(dat[[i,j]])){
+      todrop <- append(todrop, rownames(dat)[i])
+    }
+  }
+  tmp <- drop.tip(tmp, todrop)
+  trimmed <- treedata(tmp, dat[,j], sort = TRUE)
+  fitBM <- fitContinuous(trimmed$phy, trimmed$data, model = "BM")
+  fitOU <- fitContinuous(trimmed$phy, trimmed$data, model = "OU")
+  fitEB <- fitContinuous(trimmed$phy, trimmed$data, model = "EB")
+  aic <- c(fitBM$opt[["aic"]], fitOU$opt[["aic"]], fitEB$opt[["aic"]])
+  fit <- ifelse(min(aic) == aic[1], list(c(fitBM, model = "BM")), 
+                ifelse(min(aic) == aic[2], list(c(fitOU, model = "OU")), 
+                       list(c(fitEB, model = "EB"))))
+  fitResults[j] <- fit
+}
+fitResults
+}
+
+br_fit <- runFC(br_exp)
+cb_fit <- runFC(cb_exp)
+ht_fit <- runFC(ht_exp)
+kd_fit <- runFC(kd_exp)
+lv_fit <- runFC(lv_exp)
+ts_fit <- runFC(ts_exp)
+
+model_count <- function (fit) {
+  ou = 0
+  bm = 0
+  eb = 0
+  for(f in fit){
+    vec <- f
+    ifelse(vec$model == "OU", ou <- ou + 1, ifelse(vec$model == "BM", bm <- bm + 1, eb <- eb + 1))
+  }
+  df <- data.frame(OU = ou, BM = bm, EB = eb)
+  b <- df %>% pivot_longer(c(OU, BM, EB), names_to = "model")
+  b
+}
+
+df_br <- model_count(br_fit)
+df_br %>% ggplot(aes(model, value)) + geom_col() + theme_classic()
+ggsave("Mammal_organs/species_phylogeny/AIC/AIC_br.png")
+
+df_cb <- model_count(cb_fit)
+df_cb %>% ggplot(aes(model, value)) + geom_col() + theme_classic()
+ggsave("Mammal_organs/species_phylogeny/AIC/AIC_cb.png")
+
+df_ht <- model_count(ht_fit)
+df_ht %>% ggplot(aes(model, value)) + geom_col() + theme_classic()
+ggsave("Mammal_organs/species_phylogeny/AIC/AIC_ht.png")
+
+df_kd <- model_count(kd_fit)
+df_kd %>% ggplot(aes(model, value)) + geom_col() + theme_classic()
+ggsave("Mammal_organs/species_phylogeny/AIC/AIC_kd.png")
+
+df_lv <- model_count(lv_fit)
+df_lv %>% ggplot(aes(model, value)) + geom_col() + theme_classic()
+ggsave("Mammal_organs/species_phylogeny/AIC/AIC_lv.png")
+
+df_ts <- model_count(ts_fit)
+df_ts %>% ggplot(aes(model, value)) + geom_col() + theme_classic()
+ggsave("Mammal_organs/species_phylogeny/AIC/AIC_ts.png")
+
+#free up memory and then save
+rm(br_exp, cb_exp, ht_exp, kd_exp, lv_exp, ts_exp)
+save.image("Mammal_organs/species_phylogeny/afterAIC_beforeArbutus.RData")
+
+#running arbutus
+run_arb <- function (fits){
+  arby <- vector("list", length = length(fits))
+  count = 1
+  for(f in fits){
+    class(f) <- "gfit"
+    arby[[count]] <- arbutus(f)
+    count = count + 1
+  }
+  arby_df <- map_df(arby, pvalue_arbutus)
+  arby_df
+}
+
+br_result <- run_arb(br_fit)
+saveRDS(br_result, file = "Mammal_organs/species_phylogeny/arbutus/pvals_br")
+
+cb_result <- run_arb(cb_fit)
+saveRDS(cb_result, file = "Mammal_organs/species_phylogeny/arbutus/pvals_cb")
+
+ht_result <- run_arb(ht_fit)
+saveRDS(ht_result, file = "Mammal_organs/species_phylogeny/arbutus/pvals_ht")
+
+kd_result <- run_arb(kd_fit)
+saveRDS(kd_result, file = "Mammal_organs/species_phylogeny/arbutus/pvals_kd")
+
+lv_result <- run_arb(lv_fit)
+saveRDS(lv_result, file = "Mammal_organs/species_phylogeny/arbutus/pvals_lv")
+
+ts_result <- run_arb(ts_fit)
+saveRDS(ts_result, file = "Mammal_organs/species_phylogeny/arbutus/pvals_ts")
+
+br_result %>% pivot_longer(cols = everything(), names_to = "tstat") %>%
+  ggplot(aes(value)) + geom_histogram(aes(y = ..density..)) + facet_wrap(~tstat, nrow = 1) + theme_bw()
+ggsave("arbutus_br.png")
+
+cb_result %>% pivot_longer(cols = everything(), names_to = "tstat") %>%
+  ggplot(aes(value)) + geom_histogram(aes(y = ..density..)) + facet_wrap(~tstat, nrow = 1) + theme_bw()
+ggsave("arbutus_cb.png")
+
+ht_result %>% pivot_longer(cols = everything(), names_to = "tstat") %>%
+  ggplot(aes(value)) + geom_histogram(aes(y = ..density..)) + facet_wrap(~tstat, nrow = 1) + theme_bw()
+ggsave("arbutus_ht.png")
+
+kd_result %>% pivot_longer(cols = everything(), names_to = "tstat") %>%
+  ggplot(aes(value)) + geom_histogram(aes(y = ..density..)) + facet_wrap(~tstat, nrow = 1) + theme_bw()
+ggsave("arbutus_kd.png")
+
+lv_result %>% pivot_longer(cols = everything(), names_to = "tstat") %>%
+  ggplot(aes(value)) + geom_histogram(aes(y = ..density..)) + facet_wrap(~tstat, nrow = 1) + theme_bw()
+ggsave("arbutus_lv.png")
+
+ts_result %>% pivot_longer(cols = everything(), names_to = "tstat") %>%
+  ggplot(aes(value)) + geom_histogram(aes(y = ..density..)) + facet_wrap(~tstat, nrow = 1) + theme_bw()
+ggsave("arbutus_ts.png")
