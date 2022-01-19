@@ -87,6 +87,7 @@ ts_avg_dat <- ts_dat %>% group_by(hsa) %>% rename(Gene = hsa) %>% transmute("Hom
                                                                             "Monodelphis domestica" = mean(mdo.ts.M.1, mdo.ts.M.2),
                                                                             "Ornithorhynchus anatinus" = mean(oan.ts.M.1, oan.ts.M.2, oan.ts.M.3),
                                                                             "Gallus gallus" = mean(gga.ts.M.1, gga.ts.M.2))
+
 #Remove unnecessary data from env
 rm(br_dat, cb_dat, ht_dat, kd_dat, lv_dat, ts_dat, amniote_RPKM)
 
@@ -103,10 +104,13 @@ format_expr_data <- function (avgdat) {
 
 runFC <- function (dat){
 fitResults <- vector(mode = "list", length = ncol(dat))
+tdf <- treedata(species_phylo, dat, sort = TRUE)
+phy <- tdf$phy
+data <- tdf$data
 for(j in 1:ncol(dat)){
-   fitBM <- fitContinuous(species_phylo, dat[j], model = "BM")
-  fitOU <- fitContinuous(species_phylo, dat[j], model = "OU")
-  fitEB <- fitContinuous(species_phylo, dat[j], model = "EB")
+  fitBM <- fitContinuous(phy, data[,1], model = "BM")
+  fitOU <- fitContinuous(phy, data[,1], model = "OU")
+  fitEB <- fitContinuous(phy, data[,1], model = "EB")
   aic <- c(fitBM$opt[["aic"]], fitOU$opt[["aic"]], fitEB$opt[["aic"]])
   fit <- ifelse(min(aic) == aic[1], list(c(fitBM, model = "BM")), 
                 ifelse(min(aic) == aic[2], list(c(fitOU, model = "OU")), 
@@ -145,8 +149,8 @@ run_arb <- function (fits){
 total_process <- function (avgdat, part){
   exp <- format_expr_data(avgdat)
   fit <- runFC(exp)
-  fit_name <- paste0("Mammal_organs/species_phylogeny/arbutus/fit_", part)
-  saveRDS(fit, file = fit_name)
+  #fit_name <- paste0("Mammal_organs/species_phylogeny/arbutus/fit_", part)
+  #saveRDS(fit, file = fit_name)
   df <- model_count(fit)
   aic_name <- paste0("Mammal_organs/species_phylogeny/AIC/AIC_", part, ".png")
   df %>% ggplot(aes(model, value)) + geom_col() + theme_classic()
