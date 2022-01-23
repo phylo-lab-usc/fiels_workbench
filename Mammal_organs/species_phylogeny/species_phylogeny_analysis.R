@@ -108,9 +108,9 @@ tdf <- treedata(species_phylo, dat, sort = TRUE)
 phy <- tdf$phy
 data <- tdf$data
 for(j in 1:ncol(dat)){
-  fitBM <- fitContinuous(phy, data[,1], model = "BM")
-  fitOU <- fitContinuous(phy, data[,1], model = "OU")
-  fitEB <- fitContinuous(phy, data[,1], model = "EB")
+  fitBM <- fitContinuous(phy, data[,j], model = "BM")
+  fitOU <- fitContinuous(phy, data[,j], model = "OU")
+  fitEB <- fitContinuous(phy, data[,j], model = "EB")
   aic <- c(fitBM$opt[["aic"]], fitOU$opt[["aic"]], fitEB$opt[["aic"]])
   fit <- ifelse(min(aic) == aic[1], list(c(fitBM, model = "BM")), 
                 ifelse(min(aic) == aic[2], list(c(fitOU, model = "OU")), 
@@ -165,8 +165,8 @@ total_process <- function (avgdat, part){
 }
 
 total_process(br_avg_dat, "br")
-total_process(br_avg_dat, "cb")
-total_process(br_avg_dat, "ht")
-total_process(br_avg_dat, "kd")
-total_process(br_avg_dat, "lv")
-total_process(br_avg_dat, "ts")
+total_process(cb_avg_dat, "cb")
+total_process(ht_avg_dat, "ht")
+total_process(kd_avg_dat, "kd")
+total_process(lv_avg_dat, "lv")
+total_process(ts_avg_dat, "ts")
