@@ -28,7 +28,7 @@ br_avg_dat <- br_dat %>% rename(Gene = hsa) %>% group_by(Gene) %>% transmute("Ho
                                                   "Monodelphis domestica" = mean(c(mdo.br.M.1, mdo.br.F.1)),
                                                   "Ornithorhynchus anatinus" = mean(c(oan.br.M.1, oan.br.F.1)),
                                                   "Gallus gallus" = mean(c(gga.br.M.1, gga.br.F.1))) %>% 
-  ungroup() %>% slice_sample(n = 100) %>% arrange(Gene)
+  ungroup() %>% slice_head(n = 100) %>% arrange(Gene)
 
 std.error <- function ( x ) {
   sd(x) / sqrt(length(x))
@@ -46,7 +46,18 @@ br_SE <- br_dat %>% rename(Gene = hsa) %>% filter(Gene %in% br_avg_dat$Gene) %>%
             "Ornithorhynchus anatinus" = std.error(c(oan.br.M.1, oan.br.F.1)),
             "Gallus gallus" = std.error(c(gga.br.M.1, gga.br.F.1))) %>% ungroup() %>% arrange(Gene)
 
-
+single_SE <- br_SE %>% group_by(Gene) %>% transmute("Homo sapiens" = mean(c(`Homo sapiens`, `Pan troglodytes`, `Pan paniscus`, `Gorilla gorilla`,
+                                                                          `Pongo pygmaeus`, `Mus musculus`, `Macaca mulatta`,
+                                                                          `Monodelphis domestica`, `Ornithorhynchus anatinus`, `Gallus gallus`)),
+                                                    "Pan troglodytes" = `Homo sapiens`,
+                                                    "Pan paniscus" = `Homo sapiens`,
+                                                    "Gorilla gorilla" = `Homo sapiens`,
+                                                    "Pongo pygmaeus" = `Homo sapiens`,
+                                                    "Mus musculus" = `Homo sapiens`,
+                                                    "Macaca mulatta" = `Homo sapiens`,
+                                                    "Monodelphis domestica" = `Homo sapiens`,
+                                                    "Ornithorhynchus anatinus" = `Homo sapiens`,
+                                                    "Gallus gallus" = `Homo sapiens`)
 
 #Remove unnecessary data from env
 rm(br_dat, amniote_RPKM)
@@ -62,15 +73,17 @@ format_expr_data <- function (avgdat) {
 
 #Running fitcontinuous
 
-runFC <- function (dat){
+runFC <- function (dat, SE){
 fitResults <- vector(mode = "list", length = ncol(dat))
 tdf <- treedata(species_phylo, dat, sort = TRUE)
 phy <- tdf$phy
 data <- tdf$data
+SEdf <- treedata(phy, SE, sort = TRUE)
+SdE <- SEdf$data
 for(j in 1:ncol(dat)){
-  fitBM <- fitContinuous(phy, data[,j], model = "BM")
-  fitOU <- fitContinuous(phy, data[,j], model = "OU")
-  fitEB <- fitContinuous(phy, data[,j], model = "EB")
+  fitBM <- fitContinuous(phy, data[,j], SE=0, model = "BM")
+  fitOU <- fitContinuous(phy, data[,j], SE=0, model = "OU")
+  fitEB <- fitContinuous(phy, data[,j], SE=0, model = "EB")
   aic <- c(fitBM$opt[["aic"]], fitOU$opt[["aic"]], fitEB$opt[["aic"]])
   fit <- ifelse(min(aic) == aic[1], list(c(fitBM, model = "BM")), 
                 ifelse(min(aic) == aic[2], list(c(fitOU, model = "OU")), 
@@ -106,9 +119,10 @@ run_arb <- function (fits){
   arby_df
 }
 
-total_process <- function (avgdat, part){
+total_process <- function (avgdat, part, SE_dat){
   exp <- format_expr_data(avgdat)
-  fit <- runFC(exp)
+  SE <- format_expr_data(SE_dat)
+  fit <- runFC(exp, SE)
   fit_name <- paste0("Mammal_organs/species_phylogeny/arbutus/fit_", part)
   saveRDS(fit, file = fit_name)
   df <- model_count(fit)
@@ -121,7 +135,9 @@ total_process <- function (avgdat, part){
   result %>% pivot_longer(cols = everything(), names_to = "tstat") %>%
     ggplot(aes(value)) + geom_histogram(aes(y = ..density..)) + facet_wrap(~tstat, nrow = 1) + theme_bw()
   pval_name <- paste0("Mammal_organs/species_phylogeny/arbutus/arbutus_", part, ".png")
-  #ggsave(pval_name)
+  ggsave(pval_name)
 }
 
-total_process(br_avg_dat, "br")
+total_process(br_avg_dat, "S0E", single_SE)
+
+#Adding error doesn't fix the problem. 

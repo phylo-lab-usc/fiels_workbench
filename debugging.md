@@ -13,3 +13,5 @@ Starting from fit object, run arbutus step by step to see where the NA starts.
 Identify how to stop NA from being NA. Maybe default to some value?
 
 Matts Note: Add error to the fitContinuous function.
+
+Note: Adding error doesn't seem to fix the problem.
