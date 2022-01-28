@@ -65,3 +65,10 @@ all_df %>% ggplot(aes(y = sig, x = group, color = group)) + geom_point(position 
 all_df %>% ggplot(aes(y = z, x = group, color = group)) + geom_point(position = position_jitter(width = 0.1))
 
 #It looks like a BOUNDS error
+unit_list <- map(fit, make_unit_tree)
+obs <- calculate_pic_stat(unit_list)
+sim.dat <- simulate_char_unit(unit_list)
+sim <- calculate_pic_stat(sim.dat)
+res <- compare_pic_stat(obs, sim)
+plot(res)
+pvalue_arbutus(res)
