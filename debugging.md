@@ -15,3 +15,9 @@ Identify how to stop NA from being NA. Maybe default to some value?
 Matts Note: Add error to the fitContinuous function.
 
 Note: Adding error doesn't seem to fix the problem.
+
+# Debugging m.sig
+
+## Step 1:
+
+Compare m.sig values of obs vs simulated. Is there something wrong with the calculation of the p-value for these?
