@@ -14,7 +14,7 @@ Identify how to stop NA from being NA. Maybe default to some value?
 
 Matts Note: Add error to the fitContinuous function.
 
-Note: Adding error doesn't seem to fix the problem with 100 samples. Will run again with whole set maybe?
+Note: Adding error doesn't seem to fix the problem with 100 samples or the full set either. 
 
 # Debugging m.sig
 
