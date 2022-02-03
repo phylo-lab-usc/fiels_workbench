@@ -1,4 +1,4 @@
-#Debugging script
+#Debugging s.hgt script
 
 library(arbutus)
 library(geiger)

@@ -1,3 +1,5 @@
+#This copy of the script is for testing out how changing SE can affect s.hgt values.
+
 #Load required libraries
 library(ape)
 library(geiger)
@@ -28,7 +30,7 @@ br_avg_dat <- br_dat %>% rename(Gene = hsa) %>% group_by(Gene) %>% transmute("Ho
                                                   "Monodelphis domestica" = mean(c(mdo.br.M.1, mdo.br.F.1)),
                                                   "Ornithorhynchus anatinus" = mean(c(oan.br.M.1, oan.br.F.1)),
                                                   "Gallus gallus" = mean(c(gga.br.M.1, gga.br.F.1))) %>% 
-  ungroup() %>% slice_head(n = 100) %>% arrange(Gene)
+  ungroup() %>% arrange(Gene)
 
 std.error <- function ( x ) {
   sd(x) / sqrt(length(x))
@@ -140,4 +142,4 @@ total_process <- function (avgdat, part, SE_dat){
 
 total_process(br_avg_dat, "S0E", single_SE)
 
-#Adding error doesn't fix the problem. 
+#Adding error doesn't fix the problem. In this case, used a single SE for all the s.hgt values, because arbutus cannot accept multiple SE values yet. 
