@@ -80,3 +80,66 @@ step_by_step <- function(fitlist){
 inad_fit <- wrong_process()
 inad_arb <- step_by_step(inad_fit)
 plot(inad_arb)
+
+## Get plots with real data
+#Load newick format phylogeny and convert to something recognizable by ape/geiger
+species_phylo <- read.tree(file = "Mammal_organs/species_phylogeny/species_names.nwk")
+
+#Rename tips
+species_phylo$tip.label <- gsub("_", " ", species_phylo$tip.label)
+
+amniote_RPKM <- read.delim("Mammal_organs/Supplementary_Data1/NormalizedRPKM_ConstitutiveAlignedExons_Amniote1to1Orthologues.txt")
+
+br_avg_dat <- amniote_RPKM %>% select(hsa,contains(".br.")) %>% group_by(hsa) %>% rename(Gene = hsa) %>% transmute("Homo sapiens" = mean(hsa.br.M.1, hsa.br.M.2, hsa.br.M.3, hsa.br.M.4, hsa.br.M.5, hsa.br.F.1),
+                                                                            "Pan troglodytes" = mean(ptr.br.M.1, ptr.br.M.2, ptr.br.M.3, ptr.br.M.4, ptr.br.M.5, ptr.br.F.1),
+                                                                            "Pan paniscus" = mean(ppa.br.M.1, ppa.br.F.2, ppa.br.F.1),
+                                                                            "Gorilla gorilla" = mean(ggo.br.M.1, ggo.br.F.1),
+                                                                            "Pongo pygmaeus" = mean(ppy.br.M.1, ppy.br.F.1),
+                                                                            "Mus musculus" = mean(mmu.br.M.1, mmu.br.M.2, mmu.br.F.1),
+                                                                            "Macaca mulatta" = mean(mml.br.F.1, mml.br.M.1, mml.br.M.2),
+                                                                            "Monodelphis domestica" = mean(mdo.br.M.1, mdo.br.F.1),
+                                                                            "Ornithorhynchus anatinus" = mean(oan.br.M.1, oan.br.F.1),
+                                                                            "Gallus gallus" = mean(gga.br.M.1, gga.br.F.1)) %>%
+  ungroup() %>% slice_head(n = 1000)
+
+format_expr_data <- function (avgdat) {
+  temp <- avgdat %>% pull(Gene)
+  avgdat <- avgdat %>% ungroup() %>% select(!Gene)
+  dat <- flip(avgdat)
+  colnames(dat) <- temp
+  dat
+}
+
+#Running fitcontinuous
+
+runFC <- function (dat){
+  fitResults <- vector(mode = "list", length = ncol(dat))
+  tdf <- treedata(species_phylo, dat, sort = TRUE)
+  phy <- tdf$phy
+  data <- tdf$data
+  for(j in 1:ncol(dat)){
+    fitBM <- fitContinuous(phy, data[,j], model = "BM")
+    fitOU <- fitContinuous(phy, data[,j], model = "OU")
+    fitEB <- fitContinuous(phy, data[,j], model = "EB")
+    aic <- c(fitBM$opt[["aic"]], fitOU$opt[["aic"]], fitEB$opt[["aic"]])
+    fit <- ifelse(min(aic) == aic[1], list(c(fitBM, model = "BM")), 
+                  ifelse(min(aic) == aic[2], list(c(fitOU, model = "OU")), 
+                         list(c(fitEB, model = "EB"))))
+    fitResults[j] <- fit
+  }
+  fitResults
+}
+
+total_process <- function (avgdat, part){
+  exp <- format_expr_data(avgdat)
+  fit <- runFC(exp)
+  fit_name <- paste0("debugging/fit_", part)
+  saveRDS(fit, file = fit_name)
+  arb <- step_by_step(fit)
+  arb_name <- paste0("debugging/arb_", part)
+  saveRDS(arb, file = arb_name)
+  plot(arb_name)
+  ggsave("debugging/br_hist.png")
+}
+
+
