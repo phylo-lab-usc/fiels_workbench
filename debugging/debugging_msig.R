@@ -140,6 +140,8 @@ total_process <- function (avgdat, part){
   saveRDS(arb, file = arb_name)
   plot(arb_name)
   ggsave("debugging/br_hist.png")
+  pvals <- pvalue_arbutus(arb)
+  write.csv(pvals, file = "pvals_for_br_hist")
 }
 
-
+total_process(br_avg_dat, "br")
