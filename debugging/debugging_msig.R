@@ -1,10 +1,5 @@
 #debugging m.sig
 
-library(geiger)
-library(ape)
-library(arbutus)
-library(OUwie)
-library(tidyverse)
 
 #Create and modify phylogenetic tree
 simtree <- sim.bdtree()
@@ -81,7 +76,7 @@ inad_fit <- wrong_process()
 inad_arb <- step_by_step(inad_fit)
 plot(inad_arb)
 
-## Get plots with real data
+## Get plots with real data. Data below taken from the mammal organs paper. 
 #Load newick format phylogeny and convert to something recognizable by ape/geiger
 species_phylo <- read.tree(file = "Mammal_organs/species_phylogeny/species_names.nwk")
 
@@ -145,3 +140,44 @@ total_process <- function (avgdat, part){
 }
 
 total_process(br_avg_dat, "br")
+
+#Now, get squared contrasts for each unit tree. 
+gfitClass <- function ( fitObj ) {
+  class(fitObj) <- "gfit"
+  fitObj
+}
+
+fit_br <- readRDS("debugging/fit_br") %>% map(gfitClass)
+unit_trees <- fit_br %>% map(make_unit_tree)
+
+get_contrasts_squared <- function (unit_tree) {
+  contrasts <- unit_tree$pics[, "contrasts"]^2
+}
+
+contrasts_squared <- unit_trees %>% map_df(get_contrasts_squared)
+
+#Plot the squared contrasts of real data
+piv_contrasts <- contrasts_squared %>% pivot_longer(cols = everything(), values_to = "obs") %>% mutate(name = c(1:length(name)))
+mean_contrasts <- piv_contrasts %>% summarise(m = mean(obs))
+piv_contrasts %>% ggplot(aes(x = obs)) + geom_histogram() + geom_vline(xintercept = 1.11) + 
+  ggtitle("Squared Contrasts for Observed Data") + xlab("Squared Contrasts") + theme_bw()
+
+#Now let's do the same for data simulated by arbutus and compare
+simulated_data <- simulate_char_unit(unit_trees)
+simulated_con_squared <- simulated_data %>% map_df(get_contrasts_squared)
+piv_sim <- simulated_con_squared %>% pivot_longer(cols = everything(), values_to = "sim") %>% mutate(name = c(1:length(name)))
+mean_sim <- piv_sim %>% summarise(m = mean(sim))
+piv_sim %>% ggplot(aes(x = sim)) + geom_histogram() + geom_vline(xintercept = 1.02) + 
+  ggtitle("Squared Contrasts for Simulated Data") + xlab("Squared Contrasts") + theme_bw()
+
+#plot together
+piv_data <- left_join(piv_contrasts, piv_sim) %>% pivot_longer(cols = (!name), names_to = "type") %>% select(!name)
+piv_data %>% ggplot(aes(x = type, y = value, color = type)) + geom_point(position = position_jitter(width = 0.1)) + theme_bw() + 
+  ggtitle("Squared Contrasts for each unit tree") + ylab("Squared contrasts") + xlab("Data Type")
+
+#Looks equivalent. Let's look at the means for each set
+msig_obs <- unit_trees %>% map(pic_stat_msig) %>% unlist()
+msig_sim <- simulated_data %>% map(pic_stat_msig) %>% unlist()
+msig_df <- data.frame("obs" = msig_obs, "sim" = msig_sim) %>% pivot_longer(cols = everything(), names_to = "type")
+msig_df %>% ggplot(aes(x = type, y = value, color = type)) + geom_point(position = position_jitter(width = 0.1)) + theme_bw() + 
+  ggtitle("Mean of Squared Contrasts for each unit tree") + ylab("Mean of squared contrasts") + xlab("Data Type")

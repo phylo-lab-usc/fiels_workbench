@@ -14,7 +14,7 @@ Identify how to stop NA from being NA. Maybe default to some value?
 
 Matts Note: Add error to the fitContinuous function.
 
-Note: Adding error doesn't seem to fix the problem with 100 samples or the full set either. 
+Note: Adding error doesn't seem to fix the problem with 100 samples or the full set either.
 
 # Debugging m.sig
 
@@ -40,4 +40,26 @@ When using inadequate data, m.sig once again showed only one point for empirical
 
 ![](inad_hist.png)
 
-It means the means of all the contrasts is the same. Maybe it is being calculated for only one of the contrasts? Find these plots again for real data.
+It means the means of all the contrasts is the same. Maybe it is being calculated for only one of the contrasts? Real data shown below.
+
+![](br_hist.png)
+
+| m.sig | c.var | s.var | s.asr | s.hgt | d.cdf |
+|-------|-------|-------|-------|-------|-------|
+| 0.706 | 0.962 | 0.846 | 0.54  | 0.546 | 0.952 |
+
+: P-values for graph above
+
+Notably, in each of these instances the m.sig for the observed data is always tight, around a single value. Specifically, the m.sig always hovers around 1. This explains why m.sig p values are a normal distribution, because you aren't comparing 2 distributions, you are comparing a distribution to a constant! This could be caused by the way m.sig is calculated. The calculation is shown below.
+
+![](pic_stat_msig.png)
+
+Mean calculation seems correct. Perhaps there is something up with the squared contrasts themselves? Below is a comparison of the squared contrasts values between observed contrasts compared to those simulated by arbutus.
+
+![](squared_contrasts.png)
+
+Contrast distribution seemingly the same. However, the means for each unit tree tell a different story.
+
+![](mean_squared_contrasts.png)
+
+For whatever reason, the means of the squared contrasts (msig) for the the observed data (exacty same dataset as above) converge to almost exactly 1.11. But the msig for the simulated data vary. Perhaps the contrasts themselves are being incorrectly calculated?
