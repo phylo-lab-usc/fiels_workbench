@@ -62,4 +62,4 @@ Contrast distribution seemingly the same. However, the means for each unit tree 
 
 ![](mean_squared_contrasts.png)
 
-For whatever reason, the means of the squared contrasts (msig) for the the observed data (exacty same dataset as above) converge to almost exactly 1.11. But the msig for the simulated data vary. Perhaps the contrasts themselves are being incorrectly calculated?
+For whatever reason, the means of the squared contrasts (msig) for the the observed data (exacty same dataset as above) converge to almost exactly 1.11. But the msig for the simulated data vary. Perhaps the contrasts themselves are being incorrectly calculated? Could be due to the fitting of the OU process affecting the scaling of the unit trees! If the alpha parameter is too strong, could make the means equal?
