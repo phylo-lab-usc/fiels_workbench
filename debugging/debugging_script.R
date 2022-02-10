@@ -49,6 +49,7 @@ z <- fit %>% map(retrieve_z)
 #Unit trees for NAs are completely conal, unit trees for others have dimension
 #alpha values for all NA trees are around 2.7! Others have alphas that are different.
 #Write a script that finds alpha values for all NA values, plots them vs values for non NAs
+pvals <- pvals %>% slice_head(n = 100)
 test_df <- pvals %>% select(s.hgt) %>% mutate(alpha = alpha, type = type, sig = sig, z = z)
 #analysis
 

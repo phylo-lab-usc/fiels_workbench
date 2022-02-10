@@ -48,18 +48,6 @@ br_SE <- br_dat %>% rename(Gene = hsa) %>% filter(Gene %in% br_avg_dat$Gene) %>%
             "Ornithorhynchus anatinus" = std.error(c(oan.br.M.1, oan.br.F.1)),
             "Gallus gallus" = std.error(c(gga.br.M.1, gga.br.F.1))) %>% ungroup() %>% arrange(Gene)
 
-single_SE <- br_SE %>% group_by(Gene) %>% transmute("Homo sapiens" = mean(c(`Homo sapiens`, `Pan troglodytes`, `Pan paniscus`, `Gorilla gorilla`,
-                                                                          `Pongo pygmaeus`, `Mus musculus`, `Macaca mulatta`,
-                                                                          `Monodelphis domestica`, `Ornithorhynchus anatinus`, `Gallus gallus`)),
-                                                    "Pan troglodytes" = `Homo sapiens`,
-                                                    "Pan paniscus" = `Homo sapiens`,
-                                                    "Gorilla gorilla" = `Homo sapiens`,
-                                                    "Pongo pygmaeus" = `Homo sapiens`,
-                                                    "Mus musculus" = `Homo sapiens`,
-                                                    "Macaca mulatta" = `Homo sapiens`,
-                                                    "Monodelphis domestica" = `Homo sapiens`,
-                                                    "Ornithorhynchus anatinus" = `Homo sapiens`,
-                                                    "Gallus gallus" = `Homo sapiens`)
 
 #Remove unnecessary data from env
 rm(br_dat, amniote_RPKM)
@@ -80,12 +68,10 @@ fitResults <- vector(mode = "list", length = ncol(dat))
 tdf <- treedata(species_phylo, dat, sort = TRUE)
 phy <- tdf$phy
 data <- tdf$data
-SEdf <- treedata(phy, SE, sort = TRUE)
-SdE <- SEdf$data
 for(j in 1:ncol(dat)){
-  fitBM <- fitContinuous(phy, data[,j], SE=0, model = "BM")
-  fitOU <- fitContinuous(phy, data[,j], SE=0, model = "OU")
-  fitEB <- fitContinuous(phy, data[,j], SE=0, model = "EB")
+  fitBM <- fitContinuous(phy, data[,j], SE=SE, model = "BM")
+  fitOU <- fitContinuous(phy, data[,j], SE=SE, model = "OU")
+  fitEB <- fitContinuous(phy, data[,j], SE=SE, model = "EB")
   aic <- c(fitBM$opt[["aic"]], fitOU$opt[["aic"]], fitEB$opt[["aic"]])
   fit <- ifelse(min(aic) == aic[1], list(c(fitBM, model = "BM")), 
                 ifelse(min(aic) == aic[2], list(c(fitOU, model = "OU")), 
@@ -121,10 +107,9 @@ run_arb <- function (fits){
   arby_df
 }
 
-total_process <- function (avgdat, part, SE_dat){
+total_process <- function (avgdat, part, SE){
   exp <- format_expr_data(avgdat)
-  SE <- format_expr_data(SE_dat)
-  fit <- runFC(exp, SE)
+    fit <- runFC(exp, SE)
   fit_name <- paste0("Mammal_organs/species_phylogeny/arbutus/fit_", part)
   saveRDS(fit, file = fit_name)
   df <- model_count(fit)
@@ -140,6 +125,11 @@ total_process <- function (avgdat, part, SE_dat){
   ggsave(pval_name)
 }
 
-total_process(br_avg_dat, "S0E", single_SE)
+#See what happens with different SEs
+total_process(br_avg_dat, "S5E", 5)
+total_process(br_avg_dat, "S10E", 10)
+total_process(br_avg_dat, "S50E", 50)
+total_process(br_avg_dat, "S100E", 100)
+
 
 #Adding error doesn't fix the problem. In this case, used a single SE for all the s.hgt values, because arbutus cannot accept multiple SE values yet. 
