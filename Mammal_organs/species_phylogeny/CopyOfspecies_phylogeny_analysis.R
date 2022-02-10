@@ -30,7 +30,7 @@ br_avg_dat <- br_dat %>% rename(Gene = hsa) %>% group_by(Gene) %>% transmute("Ho
                                                   "Monodelphis domestica" = mean(c(mdo.br.M.1, mdo.br.F.1)),
                                                   "Ornithorhynchus anatinus" = mean(c(oan.br.M.1, oan.br.F.1)),
                                                   "Gallus gallus" = mean(c(gga.br.M.1, gga.br.F.1))) %>% 
-  ungroup() %>% arrange(Gene)
+  ungroup() %>% arrange(Gene) %>% slice_sample(n = 1000)
 
 std.error <- function ( x ) {
   sd(x) / sqrt(length(x))
