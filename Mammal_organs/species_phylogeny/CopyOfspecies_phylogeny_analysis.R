@@ -132,4 +132,4 @@ total_process(br_avg_dat, "S50E", 50)
 total_process(br_avg_dat, "S100E", 100)
 
 
-#Adding error doesn't fix the problem. In this case, used a single SE for all the s.hgt values, because arbutus cannot accept multiple SE values yet. 
+#Adding higher amounts of error actually solved the s.hgt issue!  
