@@ -5,3 +5,9 @@ The species are: Human Chimpanzee Gorilla Orangutan Macaque Mouse Opossum Platyp
 I will use a species tree provided by TimeTree http://www.timetree.org/
 
 Note: First run I averaged RPKM values, which may not be advised. Will try to with each of the values separately. (Jan 16, 2022)
+
+To do:
+Run whole process with SE values used
+Fit just OU
+Check what p-values EB datasets have
+If inconclusive, fit just EB

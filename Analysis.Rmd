@@ -1,0 +1,33 @@
+---
+title: "Analysis"
+author: "Fiel Dimayacyac"
+output: github_document
+---
+
+## Summary of Data Set
+
+The data set analyzed in this directory is taken from a study on gene expression evolution among a set of 10 species across 6 different organs. In total, they performed RNA-Seq on 5320 orthologous genes/transcripts across these species and organs. Through a hypothesis-testing framework, they showed that the rate of gene expression evolution varies across organs and species due to selective pressures. Specifically, they used hypothesis testing to determine that different lineages (or organs) had 1: Multiple evolutionary optima and 2: Had different evolutionary optima. In this case, the null hypothesis was an OU model, with the alternative hypothesis being a multi-optima OU model.
+
+```{r include=FALSE}
+#Code taken from summary of coevolution dataset, still need to edit.
+#Summary stats for Arbutus results
+library(tidyverse)
+
+p_br <- readRDS("Mammal_organs/species_phylogeny/arbutus/pvals_br")
+
+#remove msig 
+p_analyze <- p_br %>% select(!m.sig) 
+
+#Find which are less than 0.05
+p_analyze2 <- p_analyze %>% transmute(c.less = c.var <= 0.05, sv.less = s.var <= 0.05, sa.less = s.asr <= 0.05, sh.less = s.hgt <= 0.05, d.less = d.cdf <= 0.05)
+
+#Sum to get those that are less than 0.05
+p_analyze3 <- p_analyze2 %>% transmute(inade = c.less + sv.less + sa.less + sh.less + d.less)
+
+#Count
+arb_summary <- p_analyze3 %>% count(inade) %>% mutate(prop = n/sum(n)) %>% mutate(inade = as.character(inade))
+print(arb_summary)
+
+arb_summary %>% ggplot(aes(x = inade, y = n, fill = inade)) + geom_bar(stat = "identity") + 
+  xlab("Number of inadequacies") + ylab("Number of genes") + ggtitle("Amount of genes by number of inadequacies") + theme_bw()
+```

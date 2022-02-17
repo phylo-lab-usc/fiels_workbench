@@ -22,7 +22,7 @@ kd_dat <- amniote_RPKM %>% select(hsa,contains(".kd."))
 lv_dat <- amniote_RPKM %>% select(hsa,contains(".lv."))
 ts_dat <- amniote_RPKM %>% select(hsa,contains(".ts."))
 
-#Take averages of each species for each body [art]
+#Take averages of each species for each body part
 br_avg_dat <- br_dat %>% group_by(hsa) %>% rename(Gene = hsa) %>% transmute("Homo sapiens" = mean(hsa.br.M.1, hsa.br.M.2, hsa.br.M.3, hsa.br.M.4, hsa.br.M.5, hsa.br.F.1),
                                                   "Pan troglodytes" = mean(ptr.br.M.1, ptr.br.M.2, ptr.br.M.3, ptr.br.M.4, ptr.br.M.5, ptr.br.F.1),
                                                   "Pan paniscus" = mean(ppa.br.M.1, ppa.br.F.2, ppa.br.F.1),
@@ -88,6 +88,17 @@ ts_avg_dat <- ts_dat %>% group_by(hsa) %>% rename(Gene = hsa) %>% transmute("Hom
                                                                             "Ornithorhynchus anatinus" = mean(oan.ts.M.1, oan.ts.M.2, oan.ts.M.3),
                                                                             "Gallus gallus" = mean(gga.ts.M.1, gga.ts.M.2))
 
+#Standard Error function
+standard_error <- function(x) sd(x) / sqrt(length(x))
+
+#Get SE for each gene per body part
+br_SE <- br_dat %>% group_by(hsa) %>% rename(Gene = hsa) %>% summarise(Gene, SE = standard_error(across(hsa.br.M.1:gga.br.F.1)))
+cb_SE <- cb_dat %>% group_by(hsa) %>% rename(Gene = hsa) %>% summarise(Gene, SE = standard_error(across(hsa.cb.M.1:gga.cb.F.1)))
+ht_SE <- ht_dat %>% group_by(hsa) %>% rename(Gene = hsa) %>% summarise(Gene, SE = standard_error(across(hsa.ht.M.1:gga.ht.F.1)))
+kd_SE <- kd_dat %>% group_by(hsa) %>% rename(Gene = hsa) %>% summarise(Gene, SE = standard_error(across(hsa.kd.M.1:gga.kd.F.1)))
+lv_SE <- lv_dat %>% group_by(hsa) %>% rename(Gene = hsa) %>% summarise(Gene, SE = standard_error(across(hsa.lv.M.1:gga.lv.F.1)))
+ts_SE <- ts_dat %>% group_by(hsa) %>% rename(Gene = hsa) %>% summarise(Gene, SE = standard_error(across(hsa.ts.M.1:gga.ts.M.2)))
+
 #Remove unnecessary data from env
 rm(br_dat, cb_dat, ht_dat, kd_dat, lv_dat, ts_dat, amniote_RPKM)
 
@@ -102,15 +113,15 @@ format_expr_data <- function (avgdat) {
 
 #Running fitcontinuous
 
-runFC <- function (dat){
+runFC <- function ( dat, SE ){
 fitResults <- vector(mode = "list", length = ncol(dat))
 tdf <- treedata(species_phylo, dat, sort = TRUE)
 phy <- tdf$phy
 data <- tdf$data
 for(j in 1:ncol(dat)){
-  fitBM <- fitContinuous(phy, data[,j], model = "BM")
-  fitOU <- fitContinuous(phy, data[,j], model = "OU")
-  fitEB <- fitContinuous(phy, data[,j], model = "EB")
+  fitBM <- fitContinuous(phy, data[,j], SE[2,j], model = "BM")
+  fitOU <- fitContinuous(phy, data[,j], SE[2,j], model = "OU")
+  fitEB <- fitContinuous(phy, data[,j], SE[2,j], model = "EB")
   aic <- c(fitBM$opt[["aic"]], fitOU$opt[["aic"]], fitEB$opt[["aic"]])
   fit <- ifelse(min(aic) == aic[1], list(c(fitBM, model = "BM")), 
                 ifelse(min(aic) == aic[2], list(c(fitOU, model = "OU")), 
@@ -146,9 +157,9 @@ run_arb <- function (fits){
   arby_df
 }
 
-total_process <- function (avgdat, part){
+total_process <- function (avgdat, part, SE){
   exp <- format_expr_data(avgdat)
-  fit <- runFC(exp)
+  fit <- runFC(exp, SE)
   #fit_name <- paste0("Mammal_organs/species_phylogeny/arbutus/fit_", part)
   #saveRDS(fit, file = fit_name)
   df <- model_count(fit)
