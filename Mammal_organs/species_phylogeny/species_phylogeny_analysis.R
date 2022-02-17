@@ -120,9 +120,9 @@ tdf <- treedata(species_phylo, dat, sort = TRUE)
 phy <- tdf$phy
 data <- tdf$data
 for(j in 1:ncol(dat)){
-  fitBM <- fitContinuous(phy, data[,j], SE[2,j], model = "BM")
-  fitOU <- fitContinuous(phy, data[,j], SE[2,j], model = "OU")
-  fitEB <- fitContinuous(phy, data[,j], SE[2,j], model = "EB")
+  fitBM <- fitContinuous(phy, data[,j], SE[[2]][[j]], model = "BM")
+  fitOU <- fitContinuous(phy, data[,j], SE[[2]][[j]], model = "OU")
+  fitEB <- fitContinuous(phy, data[,j], SE[[2]][[j]], model = "EB")
   aic <- c(fitBM$opt[["aic"]], fitOU$opt[["aic"]], fitEB$opt[["aic"]])
   fit <- ifelse(min(aic) == aic[1], list(c(fitBM, model = "BM")), 
                 ifelse(min(aic) == aic[2], list(c(fitOU, model = "OU")), 
