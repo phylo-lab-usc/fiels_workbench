@@ -4,6 +4,7 @@ library(geiger)
 library(arbutus)
 library(tidyverse)
 library(flipR)
+library(parallel)
 
 #Load newick format phylogeny and convert to something recognizable by ape/geiger
 species_phylo <- read.tree(file = "Mammal_organs/species_phylogeny/species_names.nwk")
@@ -157,7 +158,10 @@ run_arb <- function (fits){
   arby_df
 }
 
-total_process <- function (avgdat, part, SE){
+total_process <- function (dat_list){
+  avgdat <- dat_list[[1]]
+  part <- dat_list[[2]]
+  SE <- dat_list[[3]]
   exp <- format_expr_data(avgdat)
   fit <- runFC(exp, SE)
   #fit_name <- paste0("Mammal_organs/species_phylogeny/arbutus/fit_", part)
@@ -175,9 +179,12 @@ total_process <- function (avgdat, part, SE){
   ggsave(pval_name)
 }
 
-total_process(br_avg_dat, "br")
-total_process(cb_avg_dat, "cb")
-total_process(ht_avg_dat, "ht")
-total_process(kd_avg_dat, "kd")
-total_process(lv_avg_dat, "lv")
-total_process(ts_avg_dat, "ts")
+br_list <- list(br_avg_dat, "br", br_SE)
+cb_list <- list(cb_avg_dat, "cb", cb_SE)
+ht_list <- list(ht_avg_dat, "ht", ht_SE)
+kd_list <- list(kd_avg_dat, "kd", kd_SE)
+lv_list <- list(lv_avg_dat, "lv", lv_SE)
+ts_list <- list(ts_avg_dat, "ts", ts_SE)
+all_list <- list(br_list, cb_list, ht_list, kd_list, lv_list, ts_list)
+
+mclapply(all_list, total_process, mc.cores = 6)
