@@ -13,7 +13,8 @@ The data set analyzed in this directory is taken from a study on gene expression
 #Summary stats for Arbutus results
 library(tidyverse)
 
-p_br <- readRDS("Mammal_organs/species_phylogeny/arbutus/pvals_br")
+p_br <- readRDS("species_phylogeny/arbutus/pvals_br")
+
 
 #remove msig 
 p_analyze <- p_br %>% select(!m.sig) 
