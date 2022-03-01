@@ -12,16 +12,29 @@ The data set analyzed in this directory is taken from a study on gene expression
 #Code taken from summary of coevolution dataset, still need to edit.
 #Summary stats for Arbutus results
 library(tidyverse)
+p_br <- readRDS("species_phylogeny/arbutus/pvals_br") %>% select(!m.sig) %>% transmute(c.less = c.var <= 0.05, sv.less = s.var <= 0.05, sa.less = s.asr <= 0.05, sh.less = s.hgt <= 0.05 & !is.na(s.hgt), d.less = d.cdf <= 0.05) %>% transmute(inade = c.less + sv.less + sa.less + sh.less + d.less) %>% count(inade) %>% mutate(prop = n/sum(n)) %>% mutate(inade = as.character(inade), organ = "br")
+p_cb <- readRDS("species_phylogeny/arbutus/pvals_cb") %>% select(!m.sig) %>% transmute(c.less = c.var <= 0.05, sv.less = s.var <= 0.05, sa.less = s.asr <= 0.05, sh.less = s.hgt <= 0.05 & !is.na(s.hgt), d.less = d.cdf <= 0.05) %>% transmute(inade = c.less + sv.less + sa.less + sh.less + d.less) %>% count(inade) %>% mutate(prop = n/sum(n)) %>% mutate(inade = as.character(inade), organ = "cb")
+p_ht <- readRDS("species_phylogeny/arbutus/pvals_ht") %>% select(!m.sig) %>% transmute(c.less = c.var <= 0.05, sv.less = s.var <= 0.05, sa.less = s.asr <= 0.05, sh.less = s.hgt <= 0.05 & !is.na(s.hgt), d.less = d.cdf <= 0.05) %>% transmute(inade = c.less + sv.less + sa.less + sh.less + d.less) %>% count(inade) %>% mutate(prop = n/sum(n)) %>% mutate(inade = as.character(inade), organ = "ht")
+p_lv <- readRDS("species_phylogeny/arbutus/pvals_lv") %>% select(!m.sig) %>% transmute(c.less = c.var <= 0.05, sv.less = s.var <= 0.05, sa.less = s.asr <= 0.05, sh.less = s.hgt <= 0.05 & !is.na(s.hgt), d.less = d.cdf <= 0.05) %>% transmute(inade = c.less + sv.less + sa.less + sh.less + d.less) %>% count(inade) %>% mutate(prop = n/sum(n)) %>% mutate(inade = as.character(inade), organ = "lv")
+p_kd <- readRDS("species_phylogeny/arbutus/pvals_kd") %>% select(!m.sig) %>% transmute(c.less = c.var <= 0.05, sv.less = s.var <= 0.05, sa.less = s.asr <= 0.05, sh.less = s.hgt <= 0.05 & !is.na(s.hgt), d.less = d.cdf <= 0.05) %>% transmute(inade = c.less + sv.less + sa.less + sh.less + d.less) %>% count(inade) %>% mutate(prop = n/sum(n)) %>% mutate(inade = as.character(inade), organ = "kd")
+p_ts <- readRDS("species_phylogeny/arbutus/pvals_ts") %>% select(!m.sig) %>% transmute(c.less = c.var <= 0.05, sv.less = s.var <= 0.05, sa.less = s.asr <= 0.05, sh.less = s.hgt <= 0.05 & !is.na(s.hgt), d.less = d.cdf <= 0.05) %>% transmute(inade = c.less + sv.less + sa.less + sh.less + d.less) %>% count(inade) %>% mutate(prop = n/sum(n)) %>% mutate(inade = as.character(inade), organ = "ts")
 
-p_br <- readRDS("species_phylogeny/arbutus/pvals_br") %>% select(!m.sig) %>% transmute(c.less = c.var <= 0.05, sv.less = s.var <= 0.05, sa.less = s.asr <= 0.05, sh.less = s.hgt <= 0.05 & !is.na(s.hgt), d.less = d.cdf <= 0.05) %>% transmute(inade = c.less + sv.less + sa.less + sh.less + d.less) %>% count(inade) %>% mutate(prop = n/sum(n)) %>% mutate(inade = as.character(inade))
-p_cb <- readRDS("species_phylogeny/arbutus/pvals_cb") %>% select(!m.sig) %>% transmute(c.less = c.var <= 0.05, sv.less = s.var <= 0.05, sa.less = s.asr <= 0.05, sh.less = s.hgt <= 0.05 & !is.na(s.hgt), d.less = d.cdf <= 0.05) %>% transmute(inade = c.less + sv.less + sa.less + sh.less + d.less) %>% count(inade) %>% mutate(prop = n/sum(n)) %>% mutate(inade = as.character(inade))
-p_ht <- readRDS("species_phylogeny/arbutus/pvals_ht") %>% select(!m.sig) %>% transmute(c.less = c.var <= 0.05, sv.less = s.var <= 0.05, sa.less = s.asr <= 0.05, sh.less = s.hgt <= 0.05 & !is.na(s.hgt), d.less = d.cdf <= 0.05) %>% transmute(inade = c.less + sv.less + sa.less + sh.less + d.less) %>% count(inade) %>% mutate(prop = n/sum(n)) %>% mutate(inade = as.character(inade))
-p_lv <- readRDS("species_phylogeny/arbutus/pvals_lv") %>% select(!m.sig) %>% transmute(c.less = c.var <= 0.05, sv.less = s.var <= 0.05, sa.less = s.asr <= 0.05, sh.less = s.hgt <= 0.05 & !is.na(s.hgt), d.less = d.cdf <= 0.05) %>% transmute(inade = c.less + sv.less + sa.less + sh.less + d.less) %>% count(inade) %>% mutate(prop = n/sum(n)) %>% mutate(inade = as.character(inade))
-p_kd <- readRDS("species_phylogeny/arbutus/pvals_kd") %>% select(!m.sig) %>% transmute(c.less = c.var <= 0.05, sv.less = s.var <= 0.05, sa.less = s.asr <= 0.05, sh.less = s.hgt <= 0.05 & !is.na(s.hgt), d.less = d.cdf <= 0.05) %>% transmute(inade = c.less + sv.less + sa.less + sh.less + d.less) %>% count(inade) %>% mutate(prop = n/sum(n)) %>% mutate(inade = as.character(inade))
-p_ts <- readRDS("species_phylogeny/arbutus/pvals_ts") %>% select(!m.sig) %>% transmute(c.less = c.var <= 0.05, sv.less = s.var <= 0.05, sa.less = s.asr <= 0.05, sh.less = s.hgt <= 0.05 & !is.na(s.hgt), d.less = d.cdf <= 0.05) %>% transmute(inade = c.less + sv.less + sa.less + sh.less + d.less) %>% count(inade) %>% mutate(prop = n/sum(n)) %>% mutate(inade = as.character(inade))
+p_df <- full_join(p_br, p_cb) %>% full_join(p_ht) %>% full_join(p_kd) %>% full_join(p_lv) %>% full_join(p_ts)
 
-p_br %>% ggplot(aes(x = inade, y = n, fill = inade)) + geom_bar(stat = "identity") + 
-  xlab("Number of inadequacies") + ylab("Number of genes") + ggtitle("Amount of genes by number of inadequacies") + theme_bw()
+p_df %>% ggplot(aes(x = inade, y = n, fill = inade)) + geom_bar(stat = "identity") + 
+  xlab("Number of inadequacies") + ylab("Number of genes") + ggtitle("Amount of genes by number of inadequacies") + facet_grid(~organ) + theme_bw()
 ```
+
+Overall, each organ had a similar pattern of inadequacies after full analysis. 63% or more of the genes showed no inadequacies in all organs when fitting the best-fit model, leaving 37% of genes being inadequate when fitting their best fit models. However, interestingly none of the models being tested account for multiple rates or multiple optima, which the authors of the paper heavily rely on. This may suggest that a multi-optima method may not have been necessary, but testing multi-optima OU models would be more conclusive. Furthermore, many (but still a minority) of the genes show higher relative fit for a simple BM model over OU, suggesting that perhaps even models without optima at all may be better fitting for this data set.
+
+## Methods
+
+------------------------------------------------------------------------
+
+I first conducted a relative fit analysis via AIC to compare how well each of the 3 models (BM, OU, EB) fit the data in a relative sense. Next, I performed adequacy analysis using arbutus for the best fit model as chosen above. I then conducted the same analysis for using just BM or just OU to see how it affected adequacy of the data set.
+
+## Results
+
+------------------------------------------------------------------------
 
 Now look for how many of the inadequacies are due to which test statistic. What percent of the data are inadequate in s.var and/or s.asr? Is it the same data that is inadequate in both?
