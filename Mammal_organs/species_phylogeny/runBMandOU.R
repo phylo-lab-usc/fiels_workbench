@@ -122,7 +122,7 @@ runBM <- function ( dat, SE ){
   data <- tdf$data
   for(j in 1:ncol(dat)){
     fitBM <- fitContinuous(phy, data[,j], SE[[2]][[j]], model = "BM")
-    fitResults[j] <- fitBM
+    fitResults[[j]] <- fitBM
   }
   fitResults
 }
@@ -134,7 +134,7 @@ runOU <- function ( dat, SE ){
   data <- tdf$data
   for(j in 1:ncol(dat)){
     fitOU <- fitContinuous(phy, data[,j], SE[[2]][[j]], model = "OU")
-    fitResults[j] <- fitOU
+    fitResults[[j]] <- fitOU
   }
   fitResults
 }
