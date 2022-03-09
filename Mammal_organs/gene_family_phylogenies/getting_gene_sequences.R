@@ -31,21 +31,15 @@ get_sequences_list <- function( ortholist ){
                                                                                                        "7" = opossum,
                                                                                                        "8" = platypus,
                                                                                                        "9" = chicken)) %>%
-      group_by(ensembl_gene_id)
+      dplyr::group_by(ensembl_gene_id)
     if(! nrow(sequ) == 0){
-      add <- sequ %>% filter(cdna == max(cdna))
-      df <- full_join(df, sequ)
+      add <- sequ %>% dplyr::filter(cdna == max(cdna))
+      df <- dplyr::full_join(df, sequ)
     }
   }
     saveRDS(df, file = paste0("Mammal_organs/gene_family_phylogenies/tables/", ortholist[[1]]))
-    exportFASTA(df, file = paste0("Mammal_organs/gene_family_phylogenies/fasta_files/", ortholist[[1]]))
+    exportFASTA(df, file = paste0("Mammal_organs/gene_family_phylogenies/fasta_files/", ortholist[[1]], ".fa"))
   
 }
 
-system.time(
-  map(test, get_sequences_list)
-)
-
-system.time(
-  mclapply(test, get_sequences_list, mc.cores = 4)
-)
+mclapply(seqlist, get_sequences_list, mc.cores = 6)
