@@ -4,3 +4,4 @@
 .Ruserdata
 *.fa
 /Mammal_organs/gene_family_phylogenies/tables/
+/Mammal_organs/gene_family_phylogenies/.snakemake/

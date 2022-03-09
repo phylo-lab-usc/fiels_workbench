@@ -6,7 +6,7 @@ library(parallel)
 
 ortho <- read.delim("Mammal_organs/Supplementary_Data2/Ortho_1to1_AllSpecies.txt", sep = " ")
 seqlist <- ortho %>% t() %>% as.data.frame() %>% as.list()
-test <- seqlist[1:5]
+test <- seqlist[1:2]
 
 hsapiens <- useEnsembl(dataset = "hsapiens_gene_ensembl", biomart = "ensembl")
 chimps <- useEnsembl(dataset = "ptroglodytes_gene_ensembl", biomart = "ensembl")
@@ -34,7 +34,7 @@ get_sequences_list <- function( ortholist ){
       dplyr::group_by(ensembl_gene_id)
     if(! nrow(sequ) == 0){
       add <- sequ %>% dplyr::filter(cdna == max(cdna))
-      df <- dplyr::full_join(df, sequ)
+      df <- dplyr::full_join(df, add)
     }
   }
     saveRDS(df, file = paste0("Mammal_organs/gene_family_phylogenies/tables/", ortholist[[1]]))
@@ -42,4 +42,4 @@ get_sequences_list <- function( ortholist ){
   
 }
 
-mclapply(seqlist, get_sequences_list, mc.cores = 6)
+mclapply(seqlist, get_sequences_list, mc.cores = 12)

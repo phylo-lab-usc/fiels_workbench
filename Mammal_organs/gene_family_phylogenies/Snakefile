@@ -1,0 +1,22 @@
+#Snakefile
+
+IDS, = glob_wildcards("fasta_files/{id}.fa")
+
+rule all:
+  input: expand("trees/{id}.tree", id = IDS)
+  
+rule align:
+  input:
+    "fasta_files/{id}.fa"
+  output:
+    "alignments/{id}.fasta"
+  shell:
+    "mafft --auto {input} > {output}"
+    
+rule tree:
+  input:
+    "alignments/{id}.fasta"
+  output:
+    "trees/{id}.tree"
+  shell:
+    "iqtree -s {input} > {output}"
