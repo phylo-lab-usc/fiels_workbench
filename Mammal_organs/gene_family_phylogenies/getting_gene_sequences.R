@@ -33,10 +33,11 @@ get_sequences_list <- function( ortholist ){
                                                                                                        "9" = chicken)) %>%
       dplyr::group_by(ensembl_gene_id)
     if(! nrow(sequ) == 0){
-      add <- sequ %>% dplyr::filter(cdna == max(cdna))
+      add <- sequ
       df <- dplyr::full_join(df, add)
     }
   }
+    df <- df %>% slice(2:n())
     saveRDS(df, file = paste0("Mammal_organs/gene_family_phylogenies/tables/", ortholist[[1]]))
     exportFASTA(df, file = paste0("Mammal_organs/gene_family_phylogenies/fasta_files/", ortholist[[1]], ".fa"))
   
