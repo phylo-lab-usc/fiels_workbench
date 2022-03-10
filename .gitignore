@@ -7,3 +7,5 @@
 /Mammal_organs/gene_family_phylogenies/.snakemake/
 /Mammal_organs/gene_family_phylogenies/alignments/
 /Mammal_organs/gene_family_phylogenies/trees/
+/cichlids/supplementary_data/
+/cichlids/CichlidX_GeneExpressionEvolution_script_A.Rdata
