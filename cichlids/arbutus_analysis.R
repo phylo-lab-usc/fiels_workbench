@@ -129,5 +129,4 @@ all_list <- list(br_list1, br_list2, lp_list1, lp_list2,
                  te_list1, te_list2, ov_list1, ov_list2,
                  ve_list1, ve_list2, gi_list1, gi_list2)
 
-test_list <- list(br_list1, br_list2)
-mclapply(test_list, total_process)
+mclapply(all_list, total_process, mc.cores = 6)
