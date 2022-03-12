@@ -1,0 +1,117 @@
+#NEXUS
+[R-package APE, Mon Apr 30 21:32:30 2018]
+
+BEGIN TAXA;
+	DIMENSIONS NTAX = 52;
+	TAXLABELS
+		Echis_carinatus
+		Echis_ocellatus
+		Echis_coloratus
+		Echis_pyramidum
+		Bitis_gabonica
+		Ovophis_okinavensis
+		Gloydius_intermedius
+		Protobothrops_mucrosquamatus
+		Protobothrops_elegans
+		Protobothrops_flavoviridis
+		Atropoides_picadoi
+		Cerrophidion_godmani
+		Bothrops_alternatus
+		Bothrops_neuwiedi
+		Bothrops_jararaca
+		Bothrops_insularis
+		Bothrops_jararacussu
+		Bothrops_asper
+		Bothrops_colombiensis
+		Bothrops_atrox
+		Bothrops_moojeni
+		Lachesis_muta
+		Bothriechis_schlegelii
+		Bothriechis_lateralis
+		Agkistrodon_piscivorus
+		Sistrurus_catenatus
+		Crotalus_horridus
+		Crotalus_simus
+		Crotalus_durissus
+		Crotalus_scutulatus
+		Crotalus_adamanteus
+		Micrurus_corallinus
+		Micrurus_fulvius
+		Micrurus_surinamensis
+		Micrurus_lemniscatus
+		Micrurus_altirostris
+		Micrurus_spixii
+		Ophiophagus_hannah
+		Naja_kaouthia
+		Naja_atra
+		Bungarus_flaviceps
+		Bungarus_multicinctus
+		Pseudonaja_textilis
+		Drysdalia_coronoides
+		Dispholidus_typus
+		Boiga_irregularis
+		Opheodrys_aestivus
+		Pantherophis_guttatus
+		Hypsiglena_torquata
+		Thamnodynastes_strigatus
+		Phalotris_mertensi
+		Philodryas_olfersii
+	;
+END;
+BEGIN TREES;
+	TRANSLATE
+		1	Echis_carinatus,
+		2	Echis_ocellatus,
+		3	Echis_coloratus,
+		4	Echis_pyramidum,
+		5	Bitis_gabonica,
+		6	Ovophis_okinavensis,
+		7	Gloydius_intermedius,
+		8	Protobothrops_mucrosquamatus,
+		9	Protobothrops_elegans,
+		10	Protobothrops_flavoviridis,
+		11	Atropoides_picadoi,
+		12	Cerrophidion_godmani,
+		13	Bothrops_alternatus,
+		14	Bothrops_neuwiedi,
+		15	Bothrops_jararaca,
+		16	Bothrops_insularis,
+		17	Bothrops_jararacussu,
+		18	Bothrops_asper,
+		19	Bothrops_colombiensis,
+		20	Bothrops_atrox,
+		21	Bothrops_moojeni,
+		22	Lachesis_muta,
+		23	Bothriechis_schlegelii,
+		24	Bothriechis_lateralis,
+		25	Agkistrodon_piscivorus,
+		26	Sistrurus_catenatus,
+		27	Crotalus_horridus,
+		28	Crotalus_simus,
+		29	Crotalus_durissus,
+		30	Crotalus_scutulatus,
+		31	Crotalus_adamanteus,
+		32	Micrurus_corallinus,
+		33	Micrurus_fulvius,
+		34	Micrurus_surinamensis,
+		35	Micrurus_lemniscatus,
+		36	Micrurus_altirostris,
+		37	Micrurus_spixii,
+		38	Ophiophagus_hannah,
+		39	Naja_kaouthia,
+		40	Naja_atra,
+		41	Bungarus_flaviceps,
+		42	Bungarus_multicinctus,
+		43	Pseudonaja_textilis,
+		44	Drysdalia_coronoides,
+		45	Dispholidus_typus,
+		46	Boiga_irregularis,
+		47	Opheodrys_aestivus,
+		48	Pantherophis_guttatus,
+		49	Hypsiglena_torquata,
+		50	Thamnodynastes_strigatus,
+		51	Phalotris_mertensi,
+		52	Philodryas_olfersii
+	;
+	TREE * UNTITLED = [&R] ((((1:18.815533,(2:17.548181,(3:15.403941,4:15.403941)inode3162:2.14424)inode3160:1.267352)inode3159:16.063072,5:34.878605)inode3151:7.947996,(((6:19.963027,7:19.963027)inode3219:3.486875,((8:6.430693,9:6.430693)inode3239:4.306074,10:10.736767)inode3238:12.713135)inode3218:1.072903,(((11:14.30964,12:14.30964)inode3246:6.759636,(13:13.611077,((14:9.234252,(15:2.623485,16:2.623485)inode3272:6.610767)inode3269:3.249693,(17:9.572172,(18:4.910721,(19:2.78727,(20:2.665111,21:2.665111)inode3282:0.122159)inode3280:2.123451)inode3279:4.661451)inode3274:2.911773)inode3264:1.127132)inode3259:7.458199)inode3242:1.2843,((22:19.727691,(23:17.16207,24:17.16207)inode3290:2.565621)inode3288:2.030238,(25:20.841218,(26:16.198105,((27:12.409024,(28:2.341081,29:2.341081)inode3319:10.067943)inode3316:0.380193,(30:9.161562,31:9.161562)inode3326:3.627655)inode3315:3.408888)inode3301:4.643113)inode3297:0.916711)inode3284:0.595647)inode3241:2.169229)inode3217:18.303796)inode3123:18.533589,((((32:8.848593,33:8.848593)inode3496:13.899039,((34:11.749989,35:11.749989)inode3502:4.958667,(36:4.900502,37:4.900502)inode3509:11.808154)inode3501:6.038976)inode3495:13.61266,((38:31.575696,(39:6.146788,40:6.146788)inode3525:25.428908)inode3514:3.89005,((41:29.621423,42:29.621423)inode3542:4.876941,(43:27.614336,44:27.614336)inode3572:6.884028)inode3538:0.967382)inode3513:0.894546)inode3490:16.607717,((45:34.892019,(46:33.307542,(47:32.305487,48:32.305487)inode3769:1.002055)inode3732:1.584477)inode3714:13.793181,(49:37.465832,(50:34.654548,(51:31.038139,52:31.038139)inode4086:3.616409)inode4032:2.811284)inode3970:11.219368)inode3631:4.282809)inode3351:8.392181)inode3122;
+END;
