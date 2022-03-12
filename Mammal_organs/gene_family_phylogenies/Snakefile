@@ -9,14 +9,14 @@ rule align:
   input:
     "fasta_files/{id}.fa"
   output:
-    "alignments/{id}.fasta"
+    "alignments/{id}"
   shell:
-    "mafft --auto {input} > {output}"
+    "mafft --auto --thread 8 {input} > {output}"
     
 rule tree:
   input:
-    "alignments/{id}.fasta"
+    "alignments/{id}"
   output:
     "trees/{id}.tree"
   shell:
-    "iqtree -s {input} > {output}"
+    "FastTree -quiet -nt {input} > {output}"

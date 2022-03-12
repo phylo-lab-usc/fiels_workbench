@@ -19,7 +19,7 @@ platypus <- useEnsembl(dataset = "oanatinus_gene_ensembl", biomart = "ensembl")
 chicken <- useEnsembl(dataset = "ggallus_gene_ensembl", biomart = "ensembl")
 
 get_sequences_list <- function( ortholist ){
-  df <- data.frame(cdna = "", ensembl_gene_id = "")
+  df <- data.frame(gene_exon_intron = "", ensembl_gene_id = "")
   for(c in 1:length(ortholist)){
     sequ <- getSequence(id = ortholist[[c]], type = "ensembl_gene_id", seqType = "gene_exon_intron", mart = switch(c, 
                                                                                                        "1" = hsapiens,
@@ -44,3 +44,5 @@ get_sequences_list <- function( ortholist ){
 }
 
 mclapply(seqlist, get_sequences_list, mc.cores = 12)
+
+biomartCacheClear()
