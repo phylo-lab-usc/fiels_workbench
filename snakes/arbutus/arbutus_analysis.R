@@ -13,7 +13,7 @@ data <- read.csv("snakes/data/vPhen_data.csv") %>% column_to_rownames(var = "spe
 runFC <- function ( df ){
   fitResults <- vector(mode = "list", length = ncol(df))
   for(j in 1:ncol(df)){
-    td <- treedata(tree, data[,j])
+    td <- treedata(tree, data[,j], sort = TRUE)
     fitBM <- fitContinuous(td$phy, td$data, model = "BM")
     fitOU <- fitContinuous(td$phy, td$data, model = "OU")
     fitEB <- fitContinuous(td$phy, td$data, model = "EB")
