@@ -13,10 +13,18 @@ rule align:
   shell:
     "mafft --auto --thread 8 {input} > {output}"
     
-rule tree:
+rule trim:
   input:
     "alignments/{id}"
   output:
+    "trimmed/{id}"
+  shell:
+    "trimal -in {input} -out {output}"
+    
+rule tree:
+  input:
+    "trimmed/{id}"
+  output:
     "trees/{id}.tree"
   shell:
-    "FastTree -quiet -nt {input} > {output}"
+    "FastTree -nt {input} > {output}"
