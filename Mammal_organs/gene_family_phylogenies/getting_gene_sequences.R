@@ -43,7 +43,6 @@ get_sequences_list <- function( ortholist ){
   
 }
 
-
 mclapply(seqlist, get_sequences_list, mc.cores = 12)
 #mclapply(test, get_sequences_list, mc.cores = 5)
 
