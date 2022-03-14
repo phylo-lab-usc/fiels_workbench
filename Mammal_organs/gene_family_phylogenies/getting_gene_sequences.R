@@ -6,7 +6,7 @@ library(parallel)
 
 ortho <- read.delim("Mammal_organs/Supplementary_Data2/Ortho_1to1_AllSpecies.txt", sep = " ")
 seqlist <- ortho %>% t() %>% as.data.frame() %>% as.list()
-test <- seqlist[1:2]
+test <- sample(seqlist, 7)
 
 hsapiens <- useEnsembl(dataset = "hsapiens_gene_ensembl", biomart = "ensembl")
 chimps <- useEnsembl(dataset = "ptroglodytes_gene_ensembl", biomart = "ensembl")
@@ -19,9 +19,9 @@ platypus <- useEnsembl(dataset = "oanatinus_gene_ensembl", biomart = "ensembl")
 chicken <- useEnsembl(dataset = "ggallus_gene_ensembl", biomart = "ensembl")
 
 get_sequences_list <- function( ortholist ){
-  df <- data.frame(gene_exon_intron = "", ensembl_gene_id = "")
+  df <- data.frame(cdna = "", ensembl_gene_id = "")
   for(c in 1:length(ortholist)){
-    sequ <- getSequence(id = ortholist[[c]], type = "ensembl_gene_id", seqType = "gene_exon_intron", mart = switch(c, 
+    sequ <- getSequence(id = ortholist[[c]], type = "ensembl_gene_id", seqType = "cdna", mart = switch(c, 
                                                                                                        "1" = hsapiens,
                                                                                                        "2" = chimps,
                                                                                                        "3" = gorilla,
@@ -33,7 +33,7 @@ get_sequences_list <- function( ortholist ){
                                                                                                        "9" = chicken)) %>%
       dplyr::group_by(ensembl_gene_id)
     if(! nrow(sequ) == 0){
-      add <- sequ
+      add <- sequ %>% dplyr::filter(cdna == max(cdna))
       df <- dplyr::full_join(df, add)
     }
   }
@@ -43,6 +43,8 @@ get_sequences_list <- function( ortholist ){
   
 }
 
-mclapply(seqlist, get_sequences_list, mc.cores = 12)
+
+#mclapply(seqlist, get_sequences_list, mc.cores = 12)
+mclapply(test, get_sequences_list, mc.cores = 5)
 
 biomartCacheClear()
