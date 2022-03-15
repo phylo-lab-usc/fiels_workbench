@@ -6,7 +6,7 @@ library(tidyverse)
 library(parallel)
 
 #Load the data
-tree <- read.tree("fishes/data/recodedTreeNamed.tre")
+tree <- read.tree("fishes/data/recodedTreeNamed.tre") %>% chronoMPL()
 
 data_ave <- read.csv("fishes/data/master_fpkm.csv", row.names = 1) %>% rownames_to_column("genes") %>% group_by(genes)%>%
   transmute(GholNS = mean(c(GholNS_1, GholNS_2, GholNS_3, GholNS_4, GholNS_5, GholNS_6)),
@@ -51,10 +51,12 @@ number <- function( dat_list, SE_list ){
 runFC <- function ( df, StE ){
   fitResults <- vector(mode = "list", length = ncol(df))
   td <- treedata(tree, df, sort = TRUE)
+  phy <- td$phy
+  data <- td$data
   for(j in 1:ncol(df)){
-    fitBM <- fitContinuous(td$phy, td$data, StE[[2]][[j]], model = "BM")
-    fitOU <- fitContinuous(td$phy, td$data, StE[[2]][[j]], model = "OU")
-    fitEB <- fitContinuous(td$phy, td$data, StE[[2]][[j]], model = "EB")
+    fitBM <- fitContinuous(phy, data[,j], StE[[2]][[j]], model = "BM")
+    fitOU <- fitContinuous(phy, data[,j], StE[[2]][[j]], model = "OU")
+    fitEB <- fitContinuous(phy, data[,j], StE[[2]][[j]], model = "EB")
     aic <- c(fitBM$opt[["aic"]], fitOU$opt[["aic"]], fitEB$opt[["aic"]])
     fit <- ifelse(min(aic) == aic[1], list(c(fitBM, model = "BM")), 
                   ifelse(min(aic) == aic[2], list(c(fitOU, model = "OU")), 
@@ -111,5 +113,7 @@ total_process <- function (dat_obj){
 
 
 data_modified <- number(data_ave, data_SE)
+#test <- data_modified[1]
 
 mclapply(data_modified, total_process, mc.cores = 10)
+#mclapply(test, total_process, mc.cores = 5)

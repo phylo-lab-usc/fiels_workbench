@@ -5,8 +5,14 @@ library(tidyverse)
 library(parallel)
 
 ortho <- read.delim("Mammal_organs/Supplementary_Data2/Ortho_1to1_AllSpecies.txt", sep = " ")
-seqlist <- ortho %>% t() %>% as.data.frame() %>% as.list()
-test <- sample(seqlist, 7)
+
+sub3 <- function(string){
+  res <- str_sub(string, 1, -4)
+  res
+}
+
+runlist <- list.files("Mammal_organs/gene_family_phylogenies/fasta_files/") %>% map(sub3) %>% as.character()
+seqlist <- ortho %>% filter(! Human %in% runlist) %>% t() %>% as.data.frame() %>% as.list()
 
 hsapiens <- useEnsembl(dataset = "hsapiens_gene_ensembl", biomart = "ensembl")
 chimps <- useEnsembl(dataset = "ptroglodytes_gene_ensembl", biomart = "ensembl")
@@ -43,7 +49,7 @@ get_sequences_list <- function( ortholist ){
   
 }
 
+
 mclapply(seqlist, get_sequences_list, mc.cores = 12)
-#mclapply(test, get_sequences_list, mc.cores = 5)
 
 biomartCacheClear()
