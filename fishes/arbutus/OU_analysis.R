@@ -30,7 +30,7 @@ data_ave <- read.csv("fishes/data/master_fpkm.csv", row.names = 1) %>% rownames_
             PbimS = mean(c(PbimS_1, PbimS_2, PbimS_3, PbimS_4, PbimS_5, PbimS_6)),
             XhelS = mean(c(XhelS_1, XhelS_2, XhelS_3, XhelS_4, XhelS_5, XhelS_6))) %>% column_to_rownames("genes") %>%
   split(rep(1:10, length.out = nrow(df), each = ceiling(nrow(df)/10))) %>%
-  map(t)
+  purrr::map(t)
 
 standard_error <- function(x) sd(x) / sqrt(length(x))
 
@@ -55,7 +55,7 @@ runFC <- function ( df, StE ){
   data <- td$data
   for(j in 1:ncol(df)){
     fitOU <- fitContinuous(phy, data[,j], StE[[2]][[j]], model = "OU")
-    fitResults[j] <- fitOU
+    fitResults[[j]] <- fitOU
   }
   fitResults
 }
