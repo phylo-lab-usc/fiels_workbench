@@ -92,5 +92,5 @@ total_process <- function (dat_obj){
 data_modified <- number(data_ave, data_SE)
 #test <- data_modified[1]
 
-mclapply(data_modified, total_process, mc.cores = 10)
+mclapply(data_modified, total_process, mc.cores = 6)
 #mclapply(test, total_process, mc.cores = 5)
