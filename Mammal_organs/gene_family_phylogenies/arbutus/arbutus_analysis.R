@@ -178,7 +178,7 @@ for(j in 1:ncol(dat)){
   fit <- ifelse(min(aic) == aic[1], list(c(fitBM, model = "BM")), 
                 ifelse(min(aic) == aic[2], list(c(fitOU, model = "OU")), 
                        list(c(fitEB, model = "EB"))))
-  fitResults[j] <- fit
+  fitResults[[j]] <- fit
 }
 fitResults
 }

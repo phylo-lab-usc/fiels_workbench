@@ -10,9 +10,11 @@
 /Mammal_organs/gene_family_phylogenies/trimmed/
 /Mammal_organs/gene_family_phylogenies/arbutus/AIC/
 /Mammal_organs/gene_family_phylogenies/arbutus/fits/
+/Mammal_organs/gene_family_phylogenies/arbutus/pvals/
 /fishes/arbutus/Fits/
 /fishes/arbutus/pvals/
 /fishes/arbutus/OU/Fits/
+/fishes/arbutus/OU/pvals/
 /cichlids/supplementary_data/
 /cichlids/CichlidX_GeneExpressionEvolution_script_A.Rdata
 /cichlids/arbutus/Fits/
