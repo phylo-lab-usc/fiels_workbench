@@ -19,8 +19,7 @@ tree$tip.label <- c("Heliconius_charithonia", "Heliconius_doris", "Heliconius_er
 
 plot(tree)
 
-exp_matr <- read.csv("Heliconius_Butterflies/Data/expression_matrix.csv") %>%
-  rename(Orthogroups = "ï..Orthogroups")
+exp_matr <- read.csv("Heliconius_Butterflies/Data/expression_matrix.csv") #%>%
 
 #Split into sexes
 female_dat <- exp_matr %>% as.data.frame() %>% select(Orthogroups, contains("_F"))
@@ -56,8 +55,8 @@ rm(tr, male_dat, female_dat, exp_matr)
 
 #Now need to flip tables and properly format
 format_expr_data <- function (avgdat) {
-  temp <- avgdat %>% pull(Gene)
-  avgdat <- avgdat %>% ungroup() %>% select(!Gene)
+  temp <- avgdat %>% pull(Orthogroups)
+  avgdat <- avgdat %>% ungroup() %>% select(!Orthogroups)
   dat <- flip(avgdat)
   colnames(dat) <- temp
   dat
@@ -67,7 +66,7 @@ format_expr_data <- function (avgdat) {
 
 runFC <- function ( dat, SE ){
   fitResults <- vector(mode = "list", length = ncol(dat))
-  tdf <- treedata(species_phylo, dat, sort = TRUE)
+  tdf <- treedata(tree, dat, sort = TRUE)
   phy <- tdf$phy
   data <- tdf$data
   for(j in 1:ncol(dat)){
@@ -135,4 +134,4 @@ male_list <- list(male_avg_dat, "male", male_SE)
 
 all_list <- list(female_list, male_list)
 
-#mclapply(all_list, total_process, mc.cores = 4)
+mclapply(all_list, total_process, mc.cores = 4)
