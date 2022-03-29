@@ -189,13 +189,17 @@ figure6b
 library(phytools)
 library(ape)
 library(geiger)
-library(kable)
+library(tidyverse)
+library(flipR)
 
 final_trees <- readRDS("gene_family_phylogenies/genefamilytrees")
 br_avg_dat <- readRDS("species_phylogeny/br_avg_dat")
 br_avg_dat <- br_avg_dat %>% filter(Gene %in% names(final_trees))
 species_phylo <- read.tree(file = "species_phylogeny/species_names.nwk")
 species_phylo$tip.label <- gsub("_", " ", species_phylo$tip.label)
+
+standard_error <- function(x) sd(x) / sqrt(length(x))
+
 
 format_expr_data <- function (avgdat) {
   temp <- avgdat %>% pull(Gene)
@@ -209,10 +213,17 @@ format_expr_data <- function (avgdat) {
 #remove all zeroes
 br_dat <- br_avg_dat %>% format_expr_data
 
+br_SE <- br_dat %>% as.data.frame() %>%
+  rownames_to_column("Species") %>%
+  group_by(Species) %>%
+  summarise(Species, SE = standard_error(across(ENSG00000100364:ENSG00000170946))) %>% column_to_rownames("Species") %>% as.matrix()
+
+br_SE <- br_SE[rownames(br_dat),]
+
 run_phylosig <- function (phy) {
   sig_results <- vector("list", length = ncol(br_test))
   for(i in 1:length(sig_results)){
-    res <- phylosig(phy, br_test[,i], method = "K", test = TRUE)
+    res <- phylosig(phy, br_test[,i], method = "K", test = TRUE, se = br_SE)
     sig_results[[i]] <- res
   }
   sig_results
@@ -224,7 +235,7 @@ run_phylosig_gf <- function (phy_list) {
     res <- NA
     tdf <- treedata(phy_list[[i]], br_test[,i])
     if(all_zero(tdf$data[,1])){
-      res <- phylosig(tdf$phy, tdf$data[,1], method = "K", test = TRUE)
+      res <- phylosig(tdf$phy, tdf$data[,1], method = "K", test = TRUE, se = br_SE)
     }
     sig_results[[i]] <- res
   }
