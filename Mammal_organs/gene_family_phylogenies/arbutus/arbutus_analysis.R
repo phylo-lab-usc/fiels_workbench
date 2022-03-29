@@ -33,7 +33,6 @@ br_avg_dat <- br_dat %>% group_by(hsa) %>% rename(Gene = hsa) %>% transmute("Hom
                                                   "Monodelphis domestica" = mean(mdo.br.M.1, mdo.br.F.1),
                                                   "Ornithorhynchus anatinus" = mean(oan.br.M.1, oan.br.F.1),
                                                   "Gallus gallus" = mean(gga.br.M.1, gga.br.F.1))
-
 cb_avg_dat <- cb_dat %>% group_by(hsa) %>% rename(Gene = hsa) %>% transmute("Homo sapiens" = mean(hsa.cb.M.1, hsa.cb.F.1),
                                                                             "Pan troglodytes" = mean(ptr.cb.M.1, ptr.cb.F.1),
                                                                             "Pan paniscus" = mean(ppa.cb.M.1, ppa.cb.F.1),
@@ -135,6 +134,7 @@ rename <- genetrees %>% lapply(ret_human) %>% as.vector("character")
 names(trees) <- rename
 #Reorder and remove phylos that are null and have only 1 node
 final_trees <- trees[gene_names] %>% discard(is.null) %>% keep(~ Nnode(.x) > 1)
+saveRDS(final_trees, "Mammal_organs/gene_family_phylogenies/genefamilytrees")
 
 #Now remove entries in data and SE
 br_avg_dat <- br_avg_dat %>% filter(Gene %in% names(final_trees))

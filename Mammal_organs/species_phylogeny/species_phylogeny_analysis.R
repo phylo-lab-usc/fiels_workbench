@@ -34,7 +34,7 @@ br_avg_dat <- br_dat %>% group_by(hsa) %>% rename(Gene = hsa) %>% transmute("Hom
                                                   "Monodelphis domestica" = mean(mdo.br.M.1, mdo.br.F.1),
                                                   "Ornithorhynchus anatinus" = mean(oan.br.M.1, oan.br.F.1),
                                                   "Gallus gallus" = mean(gga.br.M.1, gga.br.F.1))
-
+saveRDS(br_avg_dat, "Mammal_organs/species_phylogeny/br_avg_dat")
 cb_avg_dat <- cb_dat %>% group_by(hsa) %>% rename(Gene = hsa) %>% transmute("Homo sapiens" = mean(hsa.cb.M.1, hsa.cb.F.1),
                                                                             "Pan troglodytes" = mean(ptr.cb.M.1, ptr.cb.F.1),
                                                                             "Pan paniscus" = mean(ppa.cb.M.1, ppa.cb.F.1),
