@@ -7,8 +7,6 @@ library(OUwie)
 library(broom)
 library(arbutus)
 
-
-
 #Now, simulate birth-death tree
 
 tr <- sim.bdtree(n = 128)
@@ -28,65 +26,39 @@ sim_and_fit_arbutus <- function (tree, dat) {
   df_fix <- df
   row.names(df_fix) <- df_fix$Genus_species
   df_fix <- df_fix %>% select(X)
-  bms <- OUwie(tree, df, model = "BMS") %>% arbutus()
-  bm <- fitContinuous(tree, df_fix, model = "BM") %>% arbutus()
-  ou <- fitContinuous(tree, df_fix, model = "OU") %>% arbutus()
-  eb <- fitContinuous(tree, df_fix, model = "EB") %>% arbutus()
-  res <- list(bms, bm, ou, eb)
+  bms <- OUwie(tree, df, model = "BMS") %>% arbutus() %>% pvalue_arbutus()
+  bm <- fitContinuous(tree, df_fix, model = "BM") %>% arbutus() %>% pvalue_arbutus()
+  ou <- fitContinuous(tree, df_fix, model = "OU") %>% arbutus() %>% pvalue_arbutus()
+  eb <- fitContinuous(tree, df_fix, model = "EB") %>% arbutus() %>% pvalue_arbutus()
+  res <- list(bms = bms, bm = bm, ou = ou, eb = eb)
   res
 }
 
-test1 <- sim_and_fit_arbutus(tree_OUwie, dat1)
-
 #run the sims
-OU_adequacy <- replicate(1000, sim_and_fit_arbutus2(tree_OU, dat2, model = "OU"))
-MV_adequacy <- replicate(1000, sim_and_fit_arbutus2(tree_OUwie, dat1, model = "MV"))
-MA_adequacy <- replicate(1000, sim_and_fit_arbutus2(tree_OUwie, dat1, model = "MA"))
-MVA_adequacy <- replicate(1000, sim_and_fit_arbutus2(tree_OUwie, dat1, model = "MVA"))
-BM_adequacy <- replicate(1000, sim_and_fit_arbutus2(tree_OU, dat2, model = "BM"))
-EB_adequacy <- replicate(1000, sim_EB(tree_OU, rescaled1, dat2))
-
+adequacy <- replicate(1000, sim_and_fit_arbutus(tree_OUwie, dat1))
 
 #retrieve pvals
-OU_pvals <- OU_adequacy[1,]
-MV_pvals <- MV_adequacy[1,]
-MA_pvals <- MA_adequacy[1,]
-MVA_pvals <- MVA_adequacy[1,]
-BM_pvals <- BM_adequacy[1,]
-EB_pvals <- EB_adequacy[1,]
+bms <- adequacy["bms",] %>% map_df(function(x)x) %>%
+  pivot_longer(cols = everything(), names_to = "statistic", values_to = "pvalue") %>%
+  mutate(model = "bms")
 
-#arbutus_transform() from custom_functions.R
-arbutus_transform <- function ( pval , len , tib) {
-  df <- t(data.frame(pval))
-  if(missing(tib)) tib = FALSE
-  ifelse(tib == TRUE, {
-    fin <- as_tibble(df)
-  }
-  , fin <- data.frame(df))
-  row.names(fin) <- c(1:len)
-  fin
-}
+bm <- adequacy["bm",] %>% map_df(function(x)x) %>%
+  pivot_longer(cols = everything(), names_to = "statistic", values_to = "pvalue") %>%
+  mutate(model = "bm")
 
-#transform
-OU_df <- arbutus_transform(OU_pvals, 1000) %>% mutate(model = "OU")
-MV_df <- arbutus_transform(MV_pvals, 1000) %>% mutate(model = "MV")
-MA_df <- arbutus_transform(MA_pvals, 1000) %>% mutate(model = "MA")
-MVA_df <- arbutus_transform(MVA_pvals, 1000) %>% mutate(model = "MVA")
-BM_df <- arbutus_transform(BM_pvals, 1000) %>% mutate(model = "BM")
-EB_df <- arbutus_transform(EB_pvals, 1000) %>% mutate(model = "EB")
+ou <- adequacy["ou",] %>% map_df(function(x)x) %>%
+  pivot_longer(cols = everything(), names_to = "statistic", values_to = "pvalue") %>%
+  mutate(model = "ou")
+
+eb <- adequacy["eb",] %>% map_df(function(x)x) %>%
+  pivot_longer(cols = everything(), names_to = "statistic", values_to = "pvalue") %>%
+  mutate(model = "eb")
 
 #fuse
-fuse_df <- full_join(OU_df, MV_df) %>% full_join(MA_df) %>% full_join(MVA_df) %>% full_join(BM_df) %>% full_join(EB_df)
+fuse_df <- full_join(bms, bm) %>% full_join(ou) %>% full_join(eb)
+saveRDS(fuse_df,"Arbutus_Exploration/RDSfiles/multirate_data.rds")
 
-#pivot and plot
-violin <- fuse_df %>% pivot_longer(cols = c(-model), names_to = "test.stat") %>%
-  ggplot(aes(y = value, x = model, fill = (model))) + geom_violin() + geom_boxplot(width = 0.5) + facet_wrap(~test.stat) + theme_bw()
-
-saveRDS(fuse_df,"./Arbutus_Exploration/RDSfiles/Exploration3_data")
-
-ggsave("Arbutus_Exploration/violin_all_models.png", plot = violin)
-
-#reload data
-expldata <- readRDS("./Arbutus_Exploration/RDSfiles/Exploration3_data")
-#example plot for just cvar
-cvarplot <- expldata %>% select(c.var, model) %>% ggplot(aes(x = c.var)) + geom_histogram() + facet_wrap(~model) + theme_bw() 
+#plot
+violin <- fuse_df %>% 
+  ggplot(aes(y = pvalue, x = model, fill = (model))) + geom_violin() + geom_boxplot(width = 0.5) + facet_wrap(~statistic) + theme_bw()
+ggsave("Arbutus_Exploration/Figures/multirate_comparison", plot = violin)
