@@ -1,3 +1,5 @@
+#Just BMS
+
 #Multirate Arbutus Analysis
 
 library(geiger)
@@ -79,33 +81,11 @@ runFC <- function ( dat, SE ){
   phy$node.label <- c(1,1,2,1)
   data <- tdf$data
   for(j in 1:ncol(dat)){
-    fitBM <- fitContinuous(phy, data[,j], SE[[2]][[j]], model = "BM")
-    fitOU <- fitContinuous(phy, data[,j], SE[[2]][[j]], model = "OU")
-    fitEB <- fitContinuous(phy, data[,j], SE[[2]][[j]], model = "EB")
     OUwie_df <- df %>% mutate(X = data[,j])
     fitBMS <- tryCatch(OUwie(phy, OUwie_df, model = "BMS"), error = function(x)NULL)
-    aic <- c(fitBM$opt[["aic"]], fitOU$opt[["aic"]], fitEB$opt[["aic"]], fitBMS$AIC)
-    fit <- ifelse(min(aic) == aic[1], list(c(fitBM, model = "BM")), 
-                  ifelse(min(aic) == aic[2], list(c(fitOU, model = "OU")), 
-                         ifelse(min(aic) == aic[3], list(c(fitEB, model = "EB")),
-                                list(c(fitBMS, model = "BMS")))))
-    fitResults[j] <- fit
+    fitResults[[j]] <- fitBMS
   }
   fitResults
-}
-
-model_count <- function (fit) {
-  ou = 0
-  bm = 0
-  eb = 0
-  bms = 0
-  for(f in fit){
-    vec <- f
-    ifelse(vec$model == "OU", ou <- ou + 1, ifelse(vec$model == "BM", bm <- bm + 1, ifelse(vec$model == "EB", eb <- eb + 1, bms <- bms + 1)))
-  }
-  df <- data.frame(OU = ou, BM = bm, EB = eb, BMS = bms)
-  b <- df %>% pivot_longer(c(OU, BM, EB, BMS), names_to = "model")
-  b
 }
 
 #running arbutus
@@ -126,18 +106,14 @@ total_process <- function (dat_list){
   SE <- dat_list[[3]]
   exp <- format_expr_data(avgdat)
   fit <- runFC(exp, SE)
-  fit_name <- paste0("Heliconius_Butterflies/multirate_arbutus/fit_", part)
+  fit_name <- paste0("Heliconius_Butterflies/multirate_arbutus/justBMS/fit_", part)
   saveRDS(fit, file = fit_name)
-  df <- model_count(fit)
-  aic_name <- paste0("Heliconius_Butterflies/multirate_arbutus/AIC_", part, ".png")
-  df %>% ggplot(aes(model, value)) + geom_col() + theme_classic()
-  ggsave(aic_name)
-  result <- run_arb(fit)
-  rds_name <- paste0("Heliconius_Butterflies/multirate_arbutus/pvals_", part)
+  result <- fit %>% compact() %>% run_arb()
+  rds_name <- paste0("Heliconius_Butterflies/multirate_arbutus/justBMS/pvals_", part)
   saveRDS(result, file = rds_name)
   result %>% pivot_longer(cols = everything(), names_to = "tstat") %>%
     ggplot(aes(value)) + geom_histogram(aes(y = ..density..)) + facet_wrap(~tstat, nrow = 1) + theme_bw()
-  pval_name <- paste0("Heliconius_Butterflies/multirate_arbutus/arbutus_", part, ".png")
+  pval_name <- paste0("Heliconius_Butterflies/multirate_arbutus/justBMS/arbutus_", part, ".png")
   ggsave(pval_name)
 }
 
@@ -145,4 +121,5 @@ female_list <- list(female_avg_dat, "female", female_SE)
 male_list <- list(male_avg_dat, "male", male_SE)
 
 all_list <- list(female_list, male_list)
-mclapply(all_list, total_process, mc.cores = 4)
+lapply(all_list, total_process)
+#mclapply(all_list, total_process, mc.cores = 4)

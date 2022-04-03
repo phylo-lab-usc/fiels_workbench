@@ -59,6 +59,6 @@ fuse_df <- full_join(bms, bm) %>% full_join(ou) %>% full_join(eb)
 saveRDS(fuse_df,"Arbutus_Exploration/RDSfiles/multirate_data.rds")
 
 #plot
-violin <- fuse_df %>% 
+fuse_df %>% 
   ggplot(aes(y = pvalue, x = model, fill = (model))) + geom_violin() + geom_boxplot(width = 0.5) + facet_wrap(~statistic) + theme_bw()
-ggsave("Arbutus_Exploration/Figures/multirate_comparison", plot = violin)
+ggsave("Arbutus_Exploration/Figures/multirate_comparison")
