@@ -41,3 +41,19 @@ Each of the directories below contains an Analysis.md file that summarizes the f
 -   [**gene-phylogeny-pipeline**](https://github.com/pennell-lab-ubc/gene-phylogeny-pipeline)**:** This repository contains a data pipeline to generate gene family trees to reanalyze the data in GeneExpression_coevolution using the gene family phylogenies.
 
 -   [**evogene-arbutus-comparison**](https://github.com/fieldima/evogene-arbutus-comparison)**:** This repository contains a comparative analysis of the `evogene` and `arbutus` tools in first simulated data and then real data.
+
+### Summary Table
+
+| Data set                    | Number of Genes | Number of Species |
+|-----------------------------|-----------------|-------------------|
+| cichlids                    | 32,596          | 73                |
+| fishes                      | 16,740          | 20                |
+| Heliconius_Butterflies      | 2,393           | 5                 |
+| Mammal_organs               | 5,320           | 10                |
+| snakes                      | 11              | 52                |
+| comparative_expression_2017 | 8,333           | 9                 |
+| GeneExpression_coevolution  | 3,556           | 18                |
+| interspecific_rnaseq        | 3,560           | 14                |
+|                             |                 |                   |
+|                             |                 |                   |
+|                             |                 |                   |
