@@ -1,3 +1,5 @@
+#temp script
+
 #Arbutus analysis
 
 library(geiger)
@@ -125,8 +127,8 @@ ve_list2 <- list(ve_prot, "ve", "prot")
 gi_list1 <- list(gi_lnc, "gi", "lnc")
 gi_list2 <- list(gi_prot, "gi", "prot")
 
-all_list <- list(br_list1, br_list2, lp_list1, lp_list2,
-                 te_list1, te_list2, ov_list1, ov_list2,
-                 ve_list1, ve_list2, gi_list1, gi_list2)
+all_list <- list(br_list2, lp_list2,
+                 te_list2, ov_list2,
+                 ve_list2, gi_list2)
 
 mclapply(all_list, total_process, mc.cores = 6)

@@ -1,0 +1,44 @@
+---
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Analysis of African Cichlid Fishes Data Adequacy
+
+------------------------------------------------------------------------
+
+## Introduction
+
+The data set is taken from a [paper](https://www.nature.com/articles/s41559-020-01354-3) studying gene expression data in six different organs for 73 species of African Cichlid found in Lake Tanganyika. Specifically, the paper analyzes the expression patterns of both protein-coding genes and lncRNA to study the evolutionary dynamics associated with the rapid adaptive radiation known from these fish.They find that the rate of gene expression evolution varies between organs, and that the noncoding transcripts (lncRNA) evolve faster than coding transcripts. Interestingly, they also found that the rate of evolution accelerated later rather than earlier. Lastly, they used model fitting between EB, OU, and BM data to suggest that most of this evolution was dominated by stabilizing selection, with OU acting as the proxy for stabilizing selection. I will be analyzing this data set to see if that last point stands by testing the adequacy of each of those models for this data set.
+
+## Summary Analysis
+
+```{r include=FALSE}
+library(tidyverse)
+p_prot <- readRDS("arbutus/pvals/pvals_br_prot") %>% select(!m.sig) %>% transmute(c.less = c.var <= 0.05, sv.less = s.var <= 0.05, sa.less = s.asr <= 0.05, sh.less = s.hgt <= 0.05 & !is.na(s.hgt), d.less = d.cdf <= 0.05) %>% transmute(inade = c.less + sv.less + sa.less + sh.less + d.less) %>% count(inade) %>% mutate(prop = n/sum(n)) %>% mutate(inade = as.character(inade), data = "protein")
+p_lnc <- readRDS("arbutus/pvals/pvals_br_lnc") %>% select(!m.sig) %>% transmute(c.less = c.var <= 0.05, sv.less = s.var <= 0.05, sa.less = s.asr <= 0.05, sh.less = s.hgt <= 0.05 & !is.na(s.hgt), d.less = d.cdf <= 0.05) %>% transmute(inade = c.less + sv.less + sa.less + sh.less + d.less) %>% count(inade) %>% mutate(prop = n/sum(n)) %>% mutate(inade = as.character(inade), data = "lnc")
+
+p_df <- full_join(p_prot, p_lnc) 
+
+figure1 <- p_df %>% ggplot(aes(x = inade, y = n, fill = inade)) + geom_bar(stat = "identity") + geom_text(aes(label = round(prop, digits = 2))) +
+  xlab("Number of inadequacies") + ylab("Number of genes") + labs(tag = "A") + ggtitle("Amount of genes by number of inadequacies in protein-coding and non-protein-coding genes") + facet_grid(~sex) + theme_bw() 
+```
+
+```{r}
+figure1
+```
+
+**Figure 1: Using the best-fit model (chosen by AIC) shows a high adequacy for the data set, with only 1 or 2 inadequacies.** A) Total adequacy without including the BMS model. B) Total adequacy including the BMS model. Adequacy does not seem to change at all with including another model to the analysis.
+
+Overall, the data set is quite adequate, with only \~19% of genes for males and \~16% of genes for females showing inadequacy. Adding a "rate shift" BM model did not seem to impact the overall data adequacy much.
+
+## Results
+
+### Initial Arbutus Analysis
+
+**Figure 2. Relative fit (left) and absolute fit (right) of the data.** Overall, a BM model fits the data the best in a relative sense, and in an absolute sense the best-fit model is quite adequate. The only test statistics showing a meaningful inadequacy are s.asr and s.var.
+
+After initial analysis, I hypothesized that adding a multi-rate model to the analysis would increase the fit of the data, due to inadequacies in s.asr and s.var, which were shown to have increased values under 0.05 when the true model is BMS and a single-rate model is fit in my other analysis (Analysis of Multirate models in the Arbutus Exploration folder).
