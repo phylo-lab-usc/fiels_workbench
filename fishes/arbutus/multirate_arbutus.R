@@ -9,7 +9,7 @@ library(parallel)
 tree <- read.tree("fishes/data/recodedTreeNamed.tre") %>% chronoMPL()
 
 OUwie_reg <- c(1,2,2,1,2,1,2,1,2,1,1,2,1,2,2,1,1,2,1,2)
-df <- data.frame(Genus_species = tree$tip.label, Reg = OUwie_reg)
+daf <- data.frame(Genus_species = tree$tip.label, Reg = OUwie_reg)
 
 data_ave <- read.csv("fishes/data/master_fpkm.csv", row.names = 1) %>% rownames_to_column("genes") %>% group_by(genes)%>%
   transmute(GholNS = mean(c(GholNS_1, GholNS_2, GholNS_3, GholNS_4, GholNS_5, GholNS_6)),
@@ -33,7 +33,7 @@ data_ave <- read.csv("fishes/data/master_fpkm.csv", row.names = 1) %>% rownames_
             PbimS = mean(c(PbimS_1, PbimS_2, PbimS_3, PbimS_4, PbimS_5, PbimS_6)),
             XhelS = mean(c(XhelS_1, XhelS_2, XhelS_3, XhelS_4, XhelS_5, XhelS_6))) %>% column_to_rownames("genes") %>%
   split(rep(1:10, length.out = nrow(df), each = ceiling(nrow(df)/10))) %>%
-  map(t)
+  purrr::map(t)
 
 standard_error <- function(x) sd(x) / sqrt(length(x))
 
@@ -58,10 +58,10 @@ runFC <- function ( df, StE ){
   data <- td$data
   phy$node.label <- c(1,1,1,1,2,2,2,2,2,1,1,1,2,2,1,1,2,2,2)
   for(j in 1:ncol(df)){
-    fitBM <- fitContinuous(phy, data[,j], StE[[2]][[j]], model = "BM")
-    fitOU <- fitContinuous(phy, data[,j], StE[[2]][[j]], model = "OU")
-    fitEB <- fitContinuous(phy, data[,j], StE[[2]][[j]], model = "EB")
-    OUwie_df <- df %>% mutate(X = data[,j])
+    fitBM <- fitContinuous(phy, log(data[,j]), StE[[2]][[j]], model = "BM")
+    fitOU <- fitContinuous(phy, log(data[,j]), StE[[2]][[j]], model = "OU")
+    fitEB <- fitContinuous(phy, log(data[,j]), StE[[2]][[j]], model = "EB")
+    OUwie_df <- daf %>% mutate(X = log(data[,j]))
     fitBMS <- tryCatch(OUwie(phy, OUwie_df, model = "BMS"), error = function(x)NULL)
     aic <- c(fitBM$opt[["aic"]], fitOU$opt[["aic"]], fitEB$opt[["aic"]], fitBMS$AIC)
     fit <- ifelse(min(aic) == aic[1], list(c(fitBM, model = "BM")), 
@@ -88,12 +88,7 @@ model_count <- function (fit) {
 }
 
 run_arb <- function (fits){
-  arby <- vector("list", length = length(fits))
-  count = 1
-  for(f in fits){
-    arby[[count]] <- arbutus(f)
-    count = count + 1
-  }
+  arby <- purrr::map(fits, arbutus)
   arby_df <- map_df(arby, pvalue_arbutus)
   arby_df
 }
@@ -103,21 +98,21 @@ total_process <- function (dat_obj){
   num <- dat_obj[[2]]
   se <- dat_obj[[3]]
   fit <- runFC(dat_matrix, se)
-  fit_name <- paste0("fishes/arbutus/multi-rate/Fits/fit_", num)
+  fit_name <- paste0("fishes/arbutus/multirate/Fits/fit_", num)
   saveRDS(fit, file = fit_name)
   df <- model_count(fit)
-  aic_name <- paste0("fishes/arbutus/multi-rate/AIC/AIC_", num, ".png")
+  aic_name <- paste0("fishes/arbutus/multirate/AIC/AIC_", num, ".png")
   df %>% ggplot(aes(model, value)) + geom_col() + theme_classic()
   ggsave(aic_name)
   result <- run_arb(fit)
-  rds_name <- paste0("fishes/arbutus/multi-rate/pvals/pvals_", num)
+  rds_name <- paste0("fishes/arbutus/multirate/pvals/pvals_", num)
   saveRDS(result, file = rds_name)
-  result %>% pivot_longer(cols = everything(), names_to = "tstat") %>%
+  result %>% select(!m.sig) %>% pivot_longer(cols = everything(), names_to = "tstat") %>%
     ggplot(aes(value)) + geom_histogram(aes(y = ..density..)) + facet_wrap(~tstat, nrow = 1) + theme_bw()
-  pval_name <- paste0("fishes/arbutus/multi-rate/plots/arbutus_", num, ".png")
+  pval_name <- paste0("fishes/arbutus/multirate/plots/arbutus_", num, ".png")
   ggsave(pval_name)
 }
 
-
 data_modified <- number(data_ave, data_SE)
+#lapply(data_modified, total_process)
 mclapply(data_modified, total_process, mc.cores = 10)
