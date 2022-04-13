@@ -31,13 +31,21 @@ p_df <- pvals_total %>% select(!m.sig) %>% transmute(c.less = c.var <= 0.05, sv.
 
 figure1 <- p_df %>% ggplot(aes(x = inade, y = n, fill = inade)) + geom_bar(stat = "identity") + geom_text(aes(label = round(prop, digits = 2))) +
   xlab("Number of inadequacies") + ylab("Number of genes") + labs(tag = "A") + ggtitle("Amount of genes by number of inadequacies without BMS model") + facet_grid(~sex) + theme_bw() 
+
+pvals_multi <- readRDS("arbutus/multirate/pvals/pvals_all.rds")
+
+p_dfb <- pvals_multi %>% transmute(c.less = c.var <= 0.05, sv.less = s.var <= 0.05, sa.less = s.asr <= 0.05, sh.less = s.hgt <= 0.05 & !is.na(s.hgt), d.less = d.cdf <= 0.05) %>% transmute(inade = c.less + sv.less + sa.less + sh.less + d.less) %>% count(inade) %>% mutate(prop = n/sum(n)) %>% mutate(inade = as.character(inade), sex = "male")
+
+figure1b <- p_dfb %>% ggplot(aes(x = inade, y = n, fill = inade)) + geom_bar(stat = "identity") + geom_text(aes(label = round(prop, digits = 2))) +
+  xlab("Number of inadequacies") + ylab("Number of genes") + labs(tag = "B") + ggtitle("Amount of genes by number of inadequacies with BMS model") + facet_grid(~sex) + theme_bw() 
 ```
 
-```{r}
+```{r, echo=FALSE}
 figure1
+figure1b
 ```
 
-**Figure 1: Using the best-fit model (chosen by AIC) shows a low adequacy for the data set, more than half of the data being inadequate in at least one test statistic.**
+**Figure 1: Using the best-fit model (chosen by AIC) shows a low adequacy for the data set. A)** Without the addition of a multi-rate Brownian Motion model shows less than half of genes being fully adequate. **B)** The addition of a multi-rate Brownian Motion model increases the adequacy of the data set to just over half.
 
 Overall, the data set shows inadequacies in multiple test-statistics. 20 fish species are included, with 16740 genes overall.
 
@@ -49,6 +57,54 @@ Overall, the data set shows inadequacies in multiple test-statistics. 20 fish sp
 
 <img src="arbutus/plots/arbutus_all.png" width="407"/>
 
-**Figure 2. Relative fit (left) and absolute fit (right) of the data.** Overall, a BM model fits the data the best in a relative sense, and in an absolute sense the best-fit model shows problems in all test statistics except for d.cdf.
+**Figure 2. Relative fit (left) and absolute fit (right) of the data without inclusion of a BMS model.** Overall, a BM model fits the data the best in a relative sense, and in an absolute sense the best-fit model shows problems in all test statistics except for d.cdf.
 
-After initial analysis, I hypothesized that adding a multi-rate model to the analysis would increase the fit of the data, due to inadequacies in s.asr, s.var, s,hgt, and c.var which were shown to have increased values under 0.05 when the true model is BMS and a single-rate model is fit in my other analysis (Analysis of Multirate models in the Arbutus Exploration folder). In addition, the paper that the data stems from studied rate-shifts between different lineages depending on environment. So my next arbutus analysis will incorporate a BM model where there are different rates depending on if the fish lives in a sulfur-rich environment or not.
+After initial analysis, I hypothesized that adding a multi-rate model to the analysis would increase the fit of the data, due to inadequacies in s.asr, s.var, s,hgt, and c.var which were shown to have increased values under 0.05 when the true model is BMS and a single-rate model is fit in my other analysis (Analysis of Multirate models in the Arbutus Exploration folder). In addition, the paper that the data stems from studied rate-shifts between different lineages depending on environment.
+
+For the multi-rate Brownian Motion analysis, regimes have to be set that signify differences in mutation rate. Due to the paper's analysis of fish gene expression differences due to environmental factors (living in a high-sulfur habitat or not), I set selection regimes to follow the habitat patterns of the fish. The tree below illustrates this.
+
+```{r, include=FALSE}
+
+library(ape)
+tree <- read.tree("data/recodedTreeNamed.tre") %>% chronoMPL()
+plot(tree)
+```
+
+**Figure 3. Phylogenetic tree of species included in this analysis. Species with "S" signify that this species lives in a sulfur-rich environment, with "NS" signifying they do not.** Tips labeled "S" were considered one selective regime, with "NS" being another.
+
+I then performed relative and absolute fit analysis in line with the previous analysis displayed in Figure 2 but allowing a BMS model to be included.
+
+<img src="arbutus/multirate/AIC/AIC_1.png" width="271"/>
+
+<img src="arbutus/multirate/plots/arbutus_all.png" width="407"/>
+
+**Figure 4. Relative fit (left) and absolute fit (right) of the data with inclusion of a BMS model.** Overall, the BMS model fits the data the best in a relative sense, and in an absolute sense the best-fit model shows problems in all test statistics except for d.cdf. However, compared to Figure 2, it seems that inadequacies in the coefficient of variation (c.var) have decreased.
+
+Overall it seems that the new, multi-rate model fits the data better in a relative sense, and seems to cause changes in inadequacies. Specifically, it causes less issues with c.var. I then wanted to analyze what changes were causing the overall adequacy to increase when using a BMS model; what was the BMS model adding to the absolute fit?
+
+```{r, include=FALSE}
+test <- pvals_total %>% select(!m.sig) %>% drop_na() %>%
+  transmute(c.var = c.var <= 0.05, s.var = s.var <= 0.05,
+              s.asr = s.asr <= 0.05, s.hgt = s.hgt <= 0.05 & !is.na(s.hgt),
+              d.cdf = d.cdf <= 0.05) %>% drop_na() %>% summarise(across(.fns = ~sum(.x, na.rm = TRUE))) %>% pivot_longer(cols = everything(), names_to = "test statistic") %>% mutate(models = "w/o BMS")
+
+test2 <- pvals_multi %>% drop_na() %>%
+  transmute(c.var = c.var <= 0.05, s.var = s.var <= 0.05,
+              s.asr = s.asr <= 0.05, s.hgt = s.hgt <= 0.05 & !is.na(s.hgt),
+              d.cdf = d.cdf <= 0.05) %>% drop_na() %>% summarise(across(.fns = ~sum(.x, na.rm = TRUE))) %>% pivot_longer(cols = everything(), names_to = "test statistic") %>% mutate(models = "w/ BMS")
+
+tables <- full_join(test, test2)
+
+figure5 <- tables %>% 
+  ggplot(aes(x = `test statistic`, y = value, fill = `test statistic`)) + geom_col() +
+  geom_text(aes(label = round(value, digits = 2))) + facet_wrap(vars(models)) + theme_bw() + ylab("Number of genes with an inadequacy") + ggtitle("Number of inadequacies by test statistic with and without BMS model") + xlab("Test Statistic")
+
+```
+
+```{r, echo=FALSE}
+figure5
+```
+
+**Figure 5. Number of inadequacies in the data set by test statistic.** Addition of BMS model decreased the number of inadequacies due to c.var and s.asr drastically. Slight increases in s.hgt and s.var, with d.cdf staying approximately equal.
+
+Addition of the BMS model decreased the inadequacies of the data (when using the best-fit model overall) by decreasing issues with C.var and S.asr; which are both related to rate variation. Interestingly, it seemed to increase issues with S.var and S.hgt. Still, overall adequacy of the models for the data set increased with this addition. Relative fit of BMS by AIC also seems to indicate that the BMS model was not too complex as to break the assumptions of AIC, suggesting that BMS models are better overall than the single-rate models used previously.
