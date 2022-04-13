@@ -4,6 +4,7 @@ library(geiger)
 library(arbutus)
 library(tidyverse)
 library(parallel)
+library(OUwie)
 
 #Load the data
 tree <- read.tree("fishes/data/recodedTreeNamed.tre") %>% chronoMPL()
@@ -58,11 +59,11 @@ runFC <- function ( df, StE ){
   data <- td$data
   phy$node.label <- c(1,1,1,1,2,2,2,2,2,1,1,1,2,2,1,1,2,2,2)
   for(j in 1:ncol(df)){
-    fitBM <- fitContinuous(phy, log(data[,j]), StE[[2]][[j]], model = "BM")
-    fitOU <- fitContinuous(phy, log(data[,j]), StE[[2]][[j]], model = "OU")
-    fitEB <- fitContinuous(phy, log(data[,j]), StE[[2]][[j]], model = "EB")
+    fitBM <- tryCatch(fitContinuous(phy, log(data[,j]), StE[[2]][[j]], model = "BM"), error = function(x)list(opt = list(aic = Inf)))
+    fitOU <- tryCatch(fitContinuous(phy, log(data[,j]), StE[[2]][[j]], model = "OU"), error = function(x)list(opt = list(aic = Inf)))
+    fitEB <- tryCatch(fitContinuous(phy, log(data[,j]), StE[[2]][[j]], model = "EB"), error = function(x)list(opt = list(aic = Inf)))
     OUwie_df <- daf %>% mutate(X = log(data[,j]))
-    fitBMS <- tryCatch(OUwie(phy, OUwie_df, model = "BMS"), error = function(x)NULL)
+    fitBMS <- tryCatch(OUwie(phy, OUwie_df, model = "BMS"), error = function(x)list(AIC = Inf))
     aic <- c(fitBM$opt[["aic"]], fitOU$opt[["aic"]], fitEB$opt[["aic"]], fitBMS$AIC)
     fit <- ifelse(min(aic) == aic[1], list(c(fitBM, model = "BM")), 
                   ifelse(min(aic) == aic[2], list(c(fitOU, model = "OU")), 
@@ -87,17 +88,25 @@ model_count <- function (fit) {
   b
 }
 
+class_fix <- function(fitobj){
+  if(length(fitobj) == 5) class(fitobj) <- "gfit"
+  if(length(fitobj) == 27) class(fitobj) <- "OUwie"
+  fitobj
+}
+
 run_arb <- function (fits){
-  arby <- purrr::map(fits, arbutus)
-  arby_df <- map_df(arby, pvalue_arbutus)
+  arby <- lapply(fits, function(i) try(arbutus(i), TRUE))
+  arby <- arby[sapply(arby, function(x) !inherits(x, "try-error"))]
+  arby_df <- map_df(arby, function(i) try(pvalue_arbutus(i), TRUE))
   arby_df
 }
+
 
 total_process <- function (dat_obj){
   dat_matrix <- dat_obj[[1]]
   num <- dat_obj[[2]]
   se <- dat_obj[[3]]
-  fit <- runFC(dat_matrix, se)
+  fit <- runFC(dat_matrix, se) %>% purrr::map(class_fix)
   fit_name <- paste0("fishes/arbutus/multirate/Fits/fit_", num)
   saveRDS(fit, file = fit_name)
   df <- model_count(fit)
@@ -114,5 +123,4 @@ total_process <- function (dat_obj){
 }
 
 data_modified <- number(data_ave, data_SE)
-#lapply(data_modified, total_process)
 mclapply(data_modified, total_process, mc.cores = 10)
