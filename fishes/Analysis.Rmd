@@ -27,17 +27,20 @@ readfile <- function(filename){
 
 pvals_total <- map_df(pval_files, readfile)
 
-p_df <- pvals_total %>% select(!m.sig) %>% transmute(c.less = c.var <= 0.05, sv.less = s.var <= 0.05, sa.less = s.asr <= 0.05, sh.less = s.hgt <= 0.05 & !is.na(s.hgt), d.less = d.cdf <= 0.05) %>% transmute(inade = c.less + sv.less + sa.less + sh.less + d.less) %>% count(inade) %>% mutate(prop = n/sum(n)) %>% mutate(inade = as.character(inade), sex = "male")
+p_df <- pvals_total %>% select(!m.sig) %>% transmute(c.less = c.var <= 0.05, sv.less = s.var <= 0.05, sa.less = s.asr <= 0.05, sh.less = s.hgt <= 0.05 & !is.na(s.hgt), d.less = d.cdf <= 0.05) %>% transmute(inade = c.less + sv.less + sa.less + sh.less + d.less) %>% count(inade) %>% mutate(prop = n/sum(n)) %>% mutate(inade = as.character(inade))
 
 figure1 <- p_df %>% ggplot(aes(x = inade, y = n, fill = inade)) + geom_bar(stat = "identity") + geom_text(aes(label = round(prop, digits = 2))) +
-  xlab("Number of inadequacies") + ylab("Number of genes") + labs(tag = "A") + ggtitle("Amount of genes by number of inadequacies without BMS model") + facet_grid(~sex) + theme_bw() 
+  xlab("Number of inadequacies") + ylab("Number of genes") + labs(tag = "A") + ggtitle("Amount of genes by number of inadequacies without BMS model")  + theme_bw() 
 
 pvals_multi <- readRDS("arbutus/multirate/pvals/pvals_all.rds")
+
+na_total <- pvals_total %>% select(s.hgt) %>% filter(is.na(s.hgt)) %>% summarise(`test statistic` = "s.hgt NAs", value = n(), models = "w/o BMS")
+na_multi <- pvals_multi %>% select(s.hgt) %>% filter(is.na(s.hgt)) %>% summarise(`test statistic` = "s.hgt NAs", value = n(), models = "w/ BMS")
 
 p_dfb <- pvals_multi %>% transmute(c.less = c.var <= 0.05, sv.less = s.var <= 0.05, sa.less = s.asr <= 0.05, sh.less = s.hgt <= 0.05 & !is.na(s.hgt), d.less = d.cdf <= 0.05) %>% transmute(inade = c.less + sv.less + sa.less + sh.less + d.less) %>% count(inade) %>% mutate(prop = n/sum(n)) %>% mutate(inade = as.character(inade), sex = "male")
 
 figure1b <- p_dfb %>% ggplot(aes(x = inade, y = n, fill = inade)) + geom_bar(stat = "identity") + geom_text(aes(label = round(prop, digits = 2))) +
-  xlab("Number of inadequacies") + ylab("Number of genes") + labs(tag = "B") + ggtitle("Amount of genes by number of inadequacies with BMS model") + facet_grid(~sex) + theme_bw() 
+  xlab("Number of inadequacies") + ylab("Number of genes") + labs(tag = "B") + ggtitle("Amount of genes by number of inadequacies with BMS model") + theme_bw() 
 ```
 
 ```{r, echo=FALSE}
@@ -63,7 +66,7 @@ After initial analysis, I hypothesized that adding a multi-rate model to the ana
 
 For the multi-rate Brownian Motion analysis, regimes have to be set that signify differences in mutation rate. Due to the paper's analysis of fish gene expression differences due to environmental factors (living in a high-sulfur habitat or not), I set selection regimes to follow the habitat patterns of the fish. The tree below illustrates this.
 
-```{r, include=FALSE}
+```{r, echo=FALSE}
 
 library(ape)
 tree <- read.tree("data/recodedTreeNamed.tre") %>% chronoMPL()
@@ -93,7 +96,9 @@ test2 <- pvals_multi %>% drop_na() %>%
               s.asr = s.asr <= 0.05, s.hgt = s.hgt <= 0.05 & !is.na(s.hgt),
               d.cdf = d.cdf <= 0.05) %>% drop_na() %>% summarise(across(.fns = ~sum(.x, na.rm = TRUE))) %>% pivot_longer(cols = everything(), names_to = "test statistic") %>% mutate(models = "w/ BMS")
 
-tables <- full_join(test, test2)
+tables <- full_join(test, test2) %>% full_join(na_multi) %>% full_join(na_total)
+tables$models <- as.factor(tables$models) %>% fct_relevel("w/o BMS", "w/ BMS")
+
 
 figure5 <- tables %>% 
   ggplot(aes(x = `test statistic`, y = value, fill = `test statistic`)) + geom_col() +
@@ -107,4 +112,4 @@ figure5
 
 **Figure 5. Number of inadequacies in the data set by test statistic.** Addition of BMS model decreased the number of inadequacies due to c.var and s.asr drastically. Slight increases in s.hgt and s.var, with d.cdf staying approximately equal.
 
-Addition of the BMS model decreased the inadequacies of the data (when using the best-fit model overall) by decreasing issues with C.var and S.asr; which are both related to rate variation. Interestingly, it seemed to increase issues with S.var and S.hgt. Still, overall adequacy of the models for the data set increased with this addition. Relative fit of BMS by AIC also seems to indicate that the BMS model was not too complex as to break the assumptions of AIC, suggesting that BMS models are better overall than the single-rate models used previously.
+Addition of the BMS model decreased the inadequacies of the data (when using the best-fit model overall) by decreasing issues with C.var and S.asr; which are both related to rate variation. Interestingly, it seemed to increase issues with S.var and S.hgt. However, the increase in inadequacies for s.hgt can be attributed to a decrease in the amount of NA values, as shown by the figure above; the total value of s.hgt counts plus s.hgt NA values stays consistent between the two. Still, overall adequacy of the models for the data set increased with this addition. Relative fit of BMS by AIC also seems to indicate that the BMS model was not too complex as to break the assumptions of AIC, suggesting that BMS models are better overall than the single-rate models used previously.

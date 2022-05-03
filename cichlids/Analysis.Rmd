@@ -18,27 +18,78 @@ The data set is taken from a [paper](https://www.nature.com/articles/s41559-020-
 
 ```{r include=FALSE}
 library(tidyverse)
-p_prot <- readRDS("arbutus/pvals/pvals_br_prot") %>% select(!m.sig) %>% transmute(c.less = c.var <= 0.05, sv.less = s.var <= 0.05, sa.less = s.asr <= 0.05, sh.less = s.hgt <= 0.05 & !is.na(s.hgt), d.less = d.cdf <= 0.05) %>% transmute(inade = c.less + sv.less + sa.less + sh.less + d.less) %>% count(inade) %>% mutate(prop = n/sum(n)) %>% mutate(inade = as.character(inade), data = "protein")
+pval_files <- list.files("arbutus/pvals/brain_prot/")
+
+readfile <- function(filename, fold="pvals"){
+  res <- readRDS(paste0("arbutus/", fold, "/brain_prot/", filename))
+  res
+}
+
+pvals_brain <- map_df(pval_files, readfile)
+
+p_prot <- pvals_brain %>% select(!m.sig) %>% transmute(c.less = c.var <= 0.05, sv.less = s.var <= 0.05, sa.less = s.asr <= 0.05, sh.less = s.hgt <= 0.05 & !is.na(s.hgt), d.less = d.cdf <= 0.05) %>% transmute(inade = c.less + sv.less + sa.less + sh.less + d.less) %>% count(inade) %>% mutate(prop = n/sum(n)) %>% mutate(inade = as.character(inade), data = "protein")
 p_lnc <- readRDS("arbutus/pvals/pvals_br_lnc") %>% select(!m.sig) %>% transmute(c.less = c.var <= 0.05, sv.less = s.var <= 0.05, sa.less = s.asr <= 0.05, sh.less = s.hgt <= 0.05 & !is.na(s.hgt), d.less = d.cdf <= 0.05) %>% transmute(inade = c.less + sv.less + sa.less + sh.less + d.less) %>% count(inade) %>% mutate(prop = n/sum(n)) %>% mutate(inade = as.character(inade), data = "lnc")
 
 p_df <- full_join(p_prot, p_lnc) 
 
 figure1 <- p_df %>% ggplot(aes(x = inade, y = n, fill = inade)) + geom_bar(stat = "identity") + geom_text(aes(label = round(prop, digits = 2))) +
-  xlab("Number of inadequacies") + ylab("Number of genes") + labs(tag = "A") + ggtitle("Amount of genes by number of inadequacies in protein-coding and non-protein-coding genes") + facet_grid(~sex) + theme_bw() 
+  xlab("Number of inadequacies") + ylab("Number of genes") + ggtitle("Amount of genes by number of inadequacies in protein-coding and non-protein-coding genes") + facet_wrap(~data, scales = "free") + theme_bw() 
+
+fit_files <- list.files("arbutus/Fits/brain_prot/")
+
+fits_brain <- map(fit_files, function(x)readfile(filename = x, fold = "Fits"))
+
+model_count <- function (fit) {
+  ou = 0
+  bm = 0
+  eb = 0
+  for(f in fit){
+    vec <- f
+    ifelse(vec$model == "OU", ou <- ou + 1, ifelse(vec$model == "BM", bm <- bm + 1, eb <- eb + 1))
+  }
+  df <- data.frame(OU = ou, BM = bm, EB = eb)
+  b <- df %>% pivot_longer(c(OU, BM, EB), names_to = "model")
+  b
+}
+
+counts_brain <- map_df(fits_brain, model_count) %>% group_by(model) %>% summarise(model = model, value = sum(value)) %>% unique()
+
+figure2a <- counts_brain %>% ggplot(aes(model, value)) + geom_col() + theme_classic()
+figure2b <- pvals_brain %>% select(!m.sig) %>% pivot_longer(cols = everything(), names_to = "tstat") %>%
+    ggplot(aes(value)) + geom_histogram(aes(y = ..density..)) + facet_wrap(~tstat, nrow = 1) + theme_bw()
 ```
 
 ```{r}
 figure1
 ```
 
-**Figure 1: Using the best-fit model (chosen by AIC) shows a high adequacy for the data set, with only 1 or 2 inadequacies.** A) Total adequacy without including the BMS model. B) Total adequacy including the BMS model. Adequacy does not seem to change at all with including another model to the analysis.
+**Figure 1: Using the best-fit model (chosen by AIC) shows a very low adequacy overall.** A) Total adequacy for long-non-coding RNA. B) Total adequacy for protein-coding genes. Adequacy overall is very low, with genes being only 4% adequate for lncRNA and 24% for protein-coding genes.
 
-Overall, the data set is quite adequate, with only \~19% of genes for males and \~16% of genes for females showing inadequacy. Adding a "rate shift" BM model did not seem to impact the overall data adequacy much.
+Overall it seems like the best-fit models did not adequately capture the data in neither lncRNA nor protein coding genes, suggesting that other model(s) may be needed.
 
 ## Results
 
 ### Initial Arbutus Analysis
 
-**Figure 2. Relative fit (left) and absolute fit (right) of the data.** Overall, a BM model fits the data the best in a relative sense, and in an absolute sense the best-fit model is quite adequate. The only test statistics showing a meaningful inadequacy are s.asr and s.var.
+```{r, include=FALSE}
+figure2a
+figure2b
+```
 
-After initial analysis, I hypothesized that adding a multi-rate model to the analysis would increase the fit of the data, due to inadequacies in s.asr and s.var, which were shown to have increased values under 0.05 when the true model is BMS and a single-rate model is fit in my other analysis (Analysis of Multirate models in the Arbutus Exploration folder).
+**Figure 2. Relative fit (left) and absolute fit (right) of the protein-coding genes.** Overall, a OU model fits the data the best in a relative sense, and in an absolute sense the best-fit model is quite inadequate. C.var, d.cdf, and s.asr show meaningful inadequacy.
+
+<img src="arbutus/AIC/AIC_br_lnc.png" width="327"/>
+
+<img src="arbutus/figures/arbutus_br_lnc.png" width="326"/>
+
+**Figure 3. Relative fit (left) and absolute fit (right) of the lncRNA genes.** Overall, a OU model fits the data the best in a relative sense, and in an absolute sense the best-fit model is very inadequate. C.var, d.cdf, s.asr, and s.var show meaningful inadequacy.
+
+Similarly to what the original paper found, most genes seemed to fit an OU model the best for both protein-coding and lncRNA genes. However, in an absolute sense the best fit models had high and very high numbers of inadequacies to protein-coding and lncRNA genes respectively. Because these inadequacies were related to c.var and s.asr, I hypothesize that a muti-rate BM model will better describe the data.
+
+```{r}
+library(ape)
+tree <- read.tree("expression_data_and_trees/intree")
+plot(tree)
+```
+
+However, to perform fitting using a BMS model, selective regimes need to be defined. In this case, I will use selective regimes following the ancestral history of these species. Using other information regarding the lifestyles of these fish may be more accurate and I will attempt to try that in the future. For my first BMS analysis, I will define selective regimes by cichlid "tribes".
