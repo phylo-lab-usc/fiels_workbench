@@ -54,6 +54,5 @@ Each of the directories below contains an Analysis.md file that summarizes the f
 | comparative_expression_2017 | 8,333           | 9                 |
 | GeneExpression_coevolution  | 3,556           | 18                |
 | interspecific_rnaseq        | 3,560           | 14                |
-|                             |                 |                   |
-|                             |                 |                   |
-|                             |                 |                   |
+| amalgam data                | 1,377           | 21                |
+
