@@ -1,4 +1,4 @@
-#Multirate arbutus test 2: True model is BM, testing if AIC will detect BM vs BMS
+#Multirate arbutus test 3: True model is BM, testing if AIC will detect BM vs BMS
 
 library(tidyverse)
 library(ape)

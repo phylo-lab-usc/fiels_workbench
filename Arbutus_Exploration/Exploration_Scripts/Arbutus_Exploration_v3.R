@@ -39,7 +39,11 @@ sim_and_fit_arbutus2 <- function (tree, dat, model) {
     }, 
   ifelse(model == "BM", {
     df <- OUwie.sim(tree, dat, alpha = c(1e-10, 1e-10), sigma.sq = c(0.45, 0.45), theta0 = 1.0, theta = c(0, 0))
-  })))))
+  },
+  ifelse(model == "BMS", {
+    df <- OUwie.sim(tree, dat, alpha = c(1e-10, 1e-10), sigma.sq = c(0.45, 0.90), theta0 = 1.0, theta = c(0, 0))
+  }
+  ))))))
   
   df_fix <- df
   row.names(df_fix) <- df_fix$Genus_species
@@ -70,7 +74,7 @@ MA_adequacy <- replicate(1000, sim_and_fit_arbutus2(tree_OUwie, dat1, model = "M
 MVA_adequacy <- replicate(1000, sim_and_fit_arbutus2(tree_OUwie, dat1, model = "MVA"))
 BM_adequacy <- replicate(1000, sim_and_fit_arbutus2(tree_OU, dat2, model = "BM"))
 EB_adequacy <- replicate(1000, sim_EB(tree_OU, rescaled1, dat2))
-
+BMS_adequacy <- replicate(1000, sim_and_fit_arbutus2(tree_OU, dat2, model = "BMS"))
 
 #retrieve pvals
 OU_pvals <- OU_adequacy[1,]
@@ -79,6 +83,7 @@ MA_pvals <- MA_adequacy[1,]
 MVA_pvals <- MVA_adequacy[1,]
 BM_pvals <- BM_adequacy[1,]
 EB_pvals <- EB_adequacy[1,]
+BMS_pvals <- BMS_adequacy[1,]
 
 #arbutus_transform() from custom_functions.R
 arbutus_transform <- function ( pval , len , tib) {
@@ -99,19 +104,15 @@ MA_df <- arbutus_transform(MA_pvals, 1000) %>% mutate(model = "MA")
 MVA_df <- arbutus_transform(MVA_pvals, 1000) %>% mutate(model = "MVA")
 BM_df <- arbutus_transform(BM_pvals, 1000) %>% mutate(model = "BM")
 EB_df <- arbutus_transform(EB_pvals, 1000) %>% mutate(model = "EB")
+BMS_df <- arbutus_transform(BMS_pvals, 1000) %>% mutate(model = "BMS")
 
 #fuse
-fuse_df <- full_join(OU_df, MV_df) %>% full_join(MA_df) %>% full_join(MVA_df) %>% full_join(BM_df) %>% full_join(EB_df)
+fuse_df <- full_join(OU_df, MV_df) %>% full_join(MA_df) %>% full_join(MVA_df) %>% full_join(BM_df) %>% full_join(EB_df) %>% full_join(BMS_df)
 
 #pivot and plot
 violin <- fuse_df %>% pivot_longer(cols = c(-model), names_to = "test.stat") %>%
   ggplot(aes(y = value, x = model, fill = (model))) + geom_violin() + geom_boxplot(width = 0.5) + facet_wrap(~test.stat) + theme_bw()
 
-saveRDS(fuse_df,"./Arbutus_Exploration/RDSfiles/Exploration3_data")
+saveRDS(fuse_df,"./Arbutus_Exploration/RDSfiles/Exploration3_data.rds")
 
 ggsave("Arbutus_Exploration/violin_all_models.png", plot = violin)
-
-#reload data
-expldata <- readRDS("./Arbutus_Exploration/RDSfiles/Exploration3_data")
-#example plot for just cvar
-cvarplot <- expldata %>% select(c.var, model) %>% ggplot(aes(x = c.var)) + geom_histogram() + facet_wrap(~model) + theme_bw() 
