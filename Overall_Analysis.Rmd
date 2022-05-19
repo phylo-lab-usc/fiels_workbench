@@ -1,0 +1,21 @@
+---
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Analysis of the Adequacy of Widely Used Phylogenetic Models in Gene Expression Data
+
+------------------------------------------------------------------------
+
+## Introduction
+
+The analyses in this document were run on 9 different gene expression data sets, outlined in the README file in this repository. These data sets are of hundreds of different species and tens of thousands of different genes. Some analyses were run using the species-level phylogeny, while others were run using individual gene-level phylogenies. The models interrogated in this analysis include the Brownian Motion model depicting random walk of a character trait, the Ornstein-Uhlenbeck model depicting random walk with a constraint value, and the Early Burst model depicting random walk with a slowing down of evolutionary rate as time passes. A fourth model is added, Brownian Motion with multiple rates, that allows different branches of the tree to have separate evolutionary rate parameters but is otherwise Brownian Motion. In the literature, each of these models is often used as a stand-in of an evolutionary process; Brownian Motion as neutral drift, Ornstein-Uhlenbeck as stabilizing selection, and Early Burst as adaptive radiation. The selection of a model as the "dominant model" through various model-selection processes is then often used to state that stabilizing selection is the dominant mode of evolution for some set of genes for example. Rather than make specific claims about the results of each paper, this analysis aims to understand and highlight patterns of model adequacy in the field; i.e., do the models we are using actually describe the variation in the data? Or is there much left to be desired?
+
+## Summary
+
+By using the Akaike Information Criterion to measure relative fit, I show that broadly, the Ornstein-Uhlenbeck model is the best fit for most of the data; i.e., the model with the lowest AIC for each gene is most often OU by a fair margin. In the absolute sense, most of the data was adequately modeled by the best-fit model (most commonly OU), but these models were very often inadequate in terms of rate heterogeneity. I then ran simulations to show that processes that truly had multiple rate parameters would violate the same test statistics as seen in the data. To solve this I then added a fourth model to the analysis; multi-rate Brownian Motion. In a relative sense, addition of the model then shifted the domination to this multirate BM so that most of the data was best-fit by a multi-rate model. In an absolute sense, it did somewhat reduce issues with rate heterogeneity, but other issues still persist. All in all, it seems that in general, rate heterogeneity is not being accounted for in the most commonly used models of evolution in the field, and usage of those types of models would improve data capture.
+
+## Large Datasets Support Usage of the Ornstein-Uhlenbeck Model

@@ -19,9 +19,9 @@ dictionary <- read.delim(paste0(path2, "GCF_001858045.1_ASM185804v2_genomic_gtf_
 tree <- read.tree(paste0(path2, "intree")) %>% drop.tip("Calple")
 
 #Make OUwie df
-OUwie_reg <- c(rep(1,29), rep(2,15), rep(3,4), 4, rep(5,4), rep(6,4), rep(7,8), 8, 9,10,10,11,11,12)
+OUwie_reg <- c(rep(1,10), rep(2,7), rep(1,55))
 daf <- data.frame(Genus_species = tree$tip.label, Reg = (OUwie_reg))
-tree$node.label <- c(1, rep(1, 28), rep(2, 17), rep(3, 3), 4, 4, rep(5,3), rep(6,3), 9, 8, rep(7,8), 12, 11, 11, 12)
+tree$node.label <- c(rep(1,15), rep(2,6), rep(1,50))
 plot(tree, show.node.label = TRUE)
 
 #function to separate data into lnc or protein coding
@@ -54,7 +54,7 @@ runFC <- function ( df){
   fitResults <- vector(mode = "list", length = ncol(df$data))
   phy <- df$phy
   data <- df$data
-  phy$node.label <- c(1, rep(1, 28), rep(2, 17), rep(3, 3), 4, 4, rep(5,3), rep(6,3), 9, 8, rep(7,8), 12, 11, 11, 12)
+  phy$node.label <- c(rep(1,15), rep(2,6), rep(1,50))
   for(j in 1:ncol(df$data)){
     fitBM <- tryCatch(fitContinuous(phy, (data[,j]), model = "BM"), error = function(x)list(opt = list(aic = Inf)))
     fitOU <- tryCatch(fitContinuous(phy, (data[,j]), model = "OU"), error = function(x)list(opt = list(aic = Inf)))
