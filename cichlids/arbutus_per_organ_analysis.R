@@ -100,7 +100,7 @@ total_process <- function (dat_list){
   result <- run_arb(fit)
   rds_name <- paste0("cichlids/arbutus/pvals/pvals_brain_", part, "_", type)
   saveRDS(result, file = rds_name)
-  result %>% pivot_longer(cols = everything(), names_to = "tstat") %>%
+  result %>% select(!m.sig) %>% pivot_longer(cols = everything(), names_to = "tstat") %>%
     ggplot(aes(value)) + geom_histogram(aes(y = ..density..)) + facet_wrap(~tstat, nrow = 1) + theme_bw()
   pval_name <- paste0("cichlids/arbutus/arbutus_brain_", part, "_", type, ".png")
   ggsave(pval_name)

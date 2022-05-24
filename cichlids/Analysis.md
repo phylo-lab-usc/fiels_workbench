@@ -23,10 +23,6 @@ of each of those models for this data set.
 
 ## Summary Analysis
 
-``` r
-figure1
-```
-
 ![](Analysis_files/figure-gfm/unnamed-chunk-2-1.png)<!-- -->
 
 **Figure 1: Using the best-fit model (chosen by AIC) shows a very low
@@ -43,10 +39,18 @@ model(s) may be needed.
 
 ### Initial Arbutus Analysis
 
-**Figure 2. Relative fit (left) and absolute fit (right) of the
-protein-coding genes.** Overall, a OU model fits the data the best in a
-relative sense, and in an absolute sense the best-fit model is quite
-inadequate. C.var, d.cdf, and s.asr show meaningful inadequacy.
+![](Analysis_files/figure-gfm/unnamed-chunk-3-1.png)<!-- -->
+
+    ## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
+
+    ## Warning: Removed 696 rows containing non-finite values (stat_bin).
+
+![](Analysis_files/figure-gfm/unnamed-chunk-3-2.png)<!-- -->
+
+**Figure 2. Relative fit (A) and absolute fit (B) of the protein-coding
+genes.** Overall, a OU model fits the data the best in a relative sense,
+and in an absolute sense the best-fit model is quite inadequate. C.var,
+d.cdf, and s.asr show meaningful inadequacy.
 
 <img src="arbutus/AIC/AIC_br_lnc.png" width="327"/>
 
@@ -64,17 +68,46 @@ inadequacies to protein-coding and lncRNA genes respectively. Because
 these inadequacies were related to c.var and s.asr, I hypothesize that a
 muti-rate BM model will better describe the data.
 
-``` r
-library(ape)
-tree <- read.tree("expression_data_and_trees/intree")
-plot(tree)
-```
-
-![](Analysis_files/figure-gfm/unnamed-chunk-4-1.png)<!-- -->
-
 However, to perform fitting using a BMS model, selective regimes need to
-be defined. In this case, I will use selective regimes following the
-ancestral history of these species. Using other information regarding
-the lifestyles of these fish may be more accurate and I will attempt to
-try that in the future. For my first BMS analysis, I will define
-selective regimes by cichlid “tribes”.
+be defined. To get around that issue I will use the
+[Motmot](https://github.com/PuttickMacroevolution/motmot) package to
+identify rate shifts. This package works by testing likelihoods of a
+rate shift per clade. Likelihood of a rate shift higher than a certain
+cutoff value will be considered shifts in evolutionary rate for that
+gene. The tree will then be split by evolutionary regimes before and
+after the rate shift; taking the guesswork out of the equation.
+
+![](Analysis_files/figure-gfm/unnamed-chunk-5-1.png)<!-- -->
+
+**Figure 4. Motmot analysis finds one rate shift in the tree.**
+
+Adequacy analysis of the protein data using a multiple-rate BM model
+produces the following figures.
+
+![](Analysis_files/figure-gfm/unnamed-chunk-7-1.png)<!-- -->
+
+    ## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
+
+    ## Warning: Removed 890 rows containing non-finite values (stat_bin).
+
+![](Analysis_files/figure-gfm/unnamed-chunk-7-2.png)<!-- -->
+
+**Figure 5. Relative fit (A) and absolute fit (B) of protein-coding
+genes with addition of a BMS model.** Overall, a OU model fits the data
+the best in a relative sense, with BMS being a close second. In an
+absolute sense the best-fit model is very inadequate. C.var, d.cdf,
+s.asr, and c.var show meaningful inadequacy even while using a BMS
+model.
+
+Inadequacy of the data remains high even while using a BMS model,
+showing other factors may be at play causing inadequacies in c.var. I
+then wanted to quantify the effect of the addition of BMS.
+
+![](Analysis_files/figure-gfm/unnamed-chunk-9-1.png)<!-- -->
+
+**Figure 6: Addition of a multi-rate BM process does little to lower the
+inadequacies found in the data, with similar proportions of inadequacies
+before and after usage.**
+
+Overall this shows that with this data set there must be other
+considerations not due to multiple rates on different branches.

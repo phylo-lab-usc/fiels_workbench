@@ -54,12 +54,12 @@ model_count <- function (fit) {
 
 counts_brain <- map_df(fits_brain, model_count) %>% group_by(model) %>% summarise(model = model, value = sum(value)) %>% unique()
 
-figure2a <- counts_brain %>% ggplot(aes(model, value)) + geom_col() + theme_classic()
+figure2a <- counts_brain %>% ggplot(aes(model, value)) + geom_col() + labs(tag = "A") + theme_classic()
 figure2b <- pvals_brain %>% select(!m.sig) %>% pivot_longer(cols = everything(), names_to = "tstat") %>%
-    ggplot(aes(value)) + geom_histogram(aes(y = ..density..)) + facet_wrap(~tstat, nrow = 1) + theme_bw()
+    ggplot(aes(value)) + geom_histogram(aes(y = ..density..)) + facet_wrap(~tstat, nrow = 1) + labs(tag = "B") + theme_bw()
 ```
 
-```{r}
+```{r, echo=FALSE}
 figure1
 ```
 
@@ -71,12 +71,12 @@ Overall it seems like the best-fit models did not adequately capture the data in
 
 ### Initial Arbutus Analysis
 
-```{r, include=FALSE}
+```{r, echo=FALSE}
 figure2a
 figure2b
 ```
 
-**Figure 2. Relative fit (left) and absolute fit (right) of the protein-coding genes.** Overall, a OU model fits the data the best in a relative sense, and in an absolute sense the best-fit model is quite inadequate. C.var, d.cdf, and s.asr show meaningful inadequacy.
+**Figure 2. Relative fit (A) and absolute fit (B) of the protein-coding genes.** Overall, a OU model fits the data the best in a relative sense, and in an absolute sense the best-fit model is quite inadequate. C.var, d.cdf, and s.asr show meaningful inadequacy.
 
 <img src="arbutus/AIC/AIC_br_lnc.png" width="327"/>
 
@@ -86,10 +86,82 @@ figure2b
 
 Similarly to what the original paper found, most genes seemed to fit an OU model the best for both protein-coding and lncRNA genes. However, in an absolute sense the best fit models had high and very high numbers of inadequacies to protein-coding and lncRNA genes respectively. Because these inadequacies were related to c.var and s.asr, I hypothesize that a muti-rate BM model will better describe the data.
 
-```{r}
-library(ape)
-tree <- read.tree("expression_data_and_trees/intree")
-plot(tree)
+However, to perform fitting using a BMS model, selective regimes need to be defined. To get around that issue I will use the [Motmot](https://github.com/PuttickMacroevolution/motmot) package to identify rate shifts. This package works by testing likelihoods of a rate shift per clade. Likelihood of a rate shift higher than a certain cutoff value will be considered shifts in evolutionary rate for that gene. The tree will then be split by evolutionary regimes before and after the rate shift; taking the guesswork out of the equation.
+
+```{r, include=FALSE}
+library(motmot)
+motmot_results <- readRDS("motmot1.rds")
 ```
 
-However, to perform fitting using a BMS model, selective regimes need to be defined. In this case, I will use selective regimes following the ancestral history of these species. Using other information regarding the lifestyles of these fish may be more accurate and I will attempt to try that in the future. For my first BMS analysis, I will define selective regimes by cichlid "tribes".
+```{r, echo=FALSE}
+plot(motmot_results)
+```
+
+**Figure 4. Motmot analysis finds one rate shift in the tree.**
+
+Adequacy analysis of the protein data using a multiple-rate BM model produces the following figures.
+
+```{r, include=FALSE}
+fit_files <- list.files("arbutus/multirate/Fits/")
+pval_files <- list.files("arbutus/multirate/pvals/")
+readfile2 <- function(folder, filename){
+  res <- readRDS(paste0("arbutus/multirate/", folder , filename))
+  res
+}
+
+fits_brain2 <- map(fit_files, function(x)readfile2("Fits/",filename = x))
+pvals_brain2 <- map(pval_files, function(x)readfile2("pvals/",filename = x))
+
+model_count2 <- function (fit) {
+  ou = 0
+  bm = 0
+  eb = 0
+  bms = 0
+  for(f in fit){
+    vec <- f
+    ifelse(vec$model == "OU", ou <- ou + 1, ifelse(vec$model == "BM", bm <- bm + 1, ifelse(vec$model == "EB", eb <- eb + 1, bms <- bms + 1)))
+  }
+  df <- data.frame(OU = ou, BM = bm, EB = eb, BMS = bms)
+  b <- df %>% pivot_longer(c(OU, BM, EB, BMS), names_to = "model")
+  b
+}
+
+
+counts_brain_bms <- map_df(fits_brain2, model_count2) %>% group_by(model) %>% summarise(model = model, value = sum(value)) %>% unique()
+
+figure5a <- counts_brain_bms %>% ggplot(aes(model, value)) + geom_col() + labs(tag = "A") + theme_classic()
+
+pvals_brain_bms <- map_df(pval_files, function(x)readfile2("pvals/", filename = x))
+
+figure5b <- pvals_brain_bms %>% select(!m.sig) %>% pivot_longer(cols = everything(), names_to = "tstat") %>%
+    ggplot(aes(value)) + geom_histogram(aes(y = ..density..)) + facet_wrap(~tstat, nrow = 1) + labs(tag = "B") + theme_bw()
+
+```
+
+```{r, echo=FALSE}
+figure5a
+figure5b
+```
+
+**Figure 5. Relative fit (A) and absolute fit (B) of protein-coding genes with addition of a BMS model.** Overall, a OU model fits the data the best in a relative sense, with BMS being a close second. In an absolute sense the best-fit model is very inadequate. C.var, d.cdf, s.asr, and c.var show meaningful inadequacy even while using a BMS model.
+
+Inadequacy of the data remains high even while using a BMS model, showing other factors may be at play causing inadequacies in c.var. I then wanted to quantify the effect of the addition of BMS.
+
+```{r, include = FALSE}
+p_uni <- pvals_brain %>% transmute(c.less = c.var <= 0.05, sv.less = s.var <= 0.05, sa.less = s.asr <= 0.05, sh.less = s.hgt <= 0.05 & !is.na(s.hgt), d.less = d.cdf <= 0.05) %>% transmute(inade = c.less + sv.less + sa.less + sh.less + d.less) %>% count(inade) %>% mutate(prop = n/sum(n)) %>% mutate(inade = as.character(inade), data = "w/o BMS")
+p_bms <- pvals_brain_bms %>% transmute(c.less = c.var <= 0.05, sv.less = s.var <= 0.05, sa.less = s.asr <= 0.05, sh.less = s.hgt <= 0.05 & !is.na(s.hgt), d.less = d.cdf <= 0.05) %>% transmute(inade = c.less + sv.less + sa.less + sh.less + d.less) %>% count(inade) %>% mutate(prop = n/sum(n)) %>% mutate(inade = as.character(inade), data = "w/ BMS")
+
+p_all <- full_join(p_uni, p_bms)
+
+figure6 <- p_all %>% ggplot(aes(x = inade, y = n, fill = inade)) + geom_bar(stat = "identity") + geom_text(aes(label = round(prop, digits = 2))) +
+  xlab("Number of inadequacies") + ylab("Number of genes") + ggtitle("Amount of genes by number of inadequacies with and without BMS models") + facet_wrap(~data, scales = "free") + theme_bw() 
+
+```
+
+```{r, echo=FALSE}
+figure6
+```
+
+**Figure 6: Addition of a multi-rate BM process does little to lower the inadequacies found in the data, with similar proportions of inadequacies before and after usage.**
+
+Overall this shows that with this data set there must be other considerations not due to multiple rates on different branches.

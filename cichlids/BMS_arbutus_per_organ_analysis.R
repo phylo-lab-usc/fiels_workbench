@@ -4,6 +4,7 @@ library(geiger)
 library(arbutus)
 library(tidyverse)
 library(parallel)
+library(OUwie)
 
 #Load data for brain
 path <- "cichlids/expression_data_and_trees/CichlidX_TPM_GeneExpressionMatrix_"
@@ -71,7 +72,6 @@ runFC <- function ( df){
   fitResults
 }
 
-
 model_count <- function (fit) {
   ou = 0
   bm = 0
@@ -122,5 +122,3 @@ total_process <- function (dat_list){
 
 #lapply(final_list, total_process)
 mclapply(final_list, total_process, mc.cores = 10)
-
-brain1 <- readRDS("cichlids/arbutus/multirate/pvals/pvals_brain_1_prot")
