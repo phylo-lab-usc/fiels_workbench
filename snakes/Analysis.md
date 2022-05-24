@@ -19,46 +19,19 @@ the data to test the adequacy of EB, OU, or BM models for this data.
 
 ## Summary Analysis
 
-``` r
-library(tidyverse)
-```
-
-    ## ── Attaching packages ─────────────────────────────────────── tidyverse 1.3.1 ──
-
-    ## ✓ ggplot2 3.3.5     ✓ purrr   0.3.4
-    ## ✓ tibble  3.1.6     ✓ dplyr   1.0.8
-    ## ✓ tidyr   1.2.0     ✓ stringr 1.4.0
-    ## ✓ readr   2.1.2     ✓ forcats 0.5.1
-
-    ## ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
-    ## x dplyr::filter() masks stats::filter()
-    ## x dplyr::lag()    masks stats::lag()
-
-``` r
-pvals <- readRDS("arbutus/pvals")
-
-adequacy <- pvals %>% select(!m.sig) %>% transmute(c.less = c.var <= 0.05, sv.less = s.var <= 0.05, sa.less = s.asr <= 0.05, sh.less = s.hgt <= 0.05 & !is.na(s.hgt), d.less = d.cdf <= 0.05) %>% transmute(inade = c.less + sv.less + sa.less + sh.less + d.less) %>% count(inade) %>% mutate(prop = n/sum(n))
-
-figure1 <- adequacy %>% ggplot(aes(x = inade, y = n, fill = inade)) + geom_bar(stat = "identity") + geom_text(aes(label = round(prop, digits = 2))) +
-  xlab("Number of inadequacies") + ylab("Number of genes") + ggtitle("Amount of toxins by number of inadequacies in snake venom") + theme_bw() 
-```
-
-``` r
-figure1
-```
-
 ![](Analysis_files/figure-gfm/unnamed-chunk-2-1.png)<!-- -->
 
 **Figure 1. Most genes show inadequacies in 3 or less test statistics.**
-No genes have no inadequacies.
+No genes have no inadequacies. Addition of multi-rate BM models reduced
+the inadequacy of one gene.
 
 Overall the best-fit model is not adequate for the data.
 
 ## Results
 
-<img src="arbutus/AIC.png" width="319" />
+<img src="arbutus/AIC.png" width="306"/>
 
-<img src="arbutus/arbutus.png" width="304" />
+<img src="arbutus/arbutus.png" width="355"/>
 
 **Figure 2. Relative fit (left) and absolute fit (right) of the toxin
 genes.** Most test statistics show a left-skew; suggesting inadequacies.
@@ -70,4 +43,22 @@ single-rate models, suggests that the authors of the study were correct
 in using models that allow rate to change, such as the Levy “pulsed
 rate” model.
 
-Next, I will determine if a multi-rate BM model can suffice.
+I then added multiple-rate BM models to my analysis to see if that could
+alleviate the inadequacies shown here. Evolutionary regimes were
+determined by first running the Motmot package to detect rate shifts.
+The adequacy results are shown below.
+
+<img src="arbutus/BMS/AIC.png" width="319"/>
+
+<img src="arbutus/BMS/arbutus.png" width="325"/>
+
+**Figure 3. Relative fit (left) and absolute fit (right) of the toxin
+genes when adding BMS model to analysis.** Most test statistics show a
+left-skew; suggesting inadequacies. Most notable are c.var and s.asr;
+test statistics often violated when the true model has multiple rates.
+There is one less inadequacy in c.var.
+
+As shown in Figure 1 and Figure 3, addition of the BMS model to my
+analysis only slightly reduced the inadequacies shown from rate
+heterogeneity. This suggests other factors may be causing the best-fit
+models to not adequately explain the variation in the data.

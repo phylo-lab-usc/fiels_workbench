@@ -4,28 +4,31 @@ library(geiger)
 library(arbutus)
 library(tidyverse)
 library(parallel)
+library(OUwie)
 
 #Load the data
 tree <- read.nexus("snakes/data/Final_tree.nex")
 data <- read.csv("snakes/data/vPhen_data.csv") %>% column_to_rownames(var = "species") %>%
   select(-c(Total, cm, Family, Author, Tech, Ref)) %>% as.matrix()
+motmot <- readRDS("snakes/arbutus/motmot.rds")
 
 #Make OUwie df
-#OUwie_reg <- c(rep(1,10), rep(2,7), rep(1,55))
-#daf <- data.frame(Genus_species = tree$tip.label, Reg = (OUwie_reg))
-#tree$node.label <- c(rep(1,15), rep(2,6), rep(1,50))
+OUwie_reg <- c(rep(1,40), rep(2,4), rep(1,8))
+daf <- data.frame(Genus_species = tree$tip.label, Reg = (OUwie_reg))
+tree$node.label <- c(rep(1,41), rep(2,3), rep(1,7))
+plot(tree, show.node.label = TRUE)
 
 #Functions
 runFC <- function ( df ){
   fitResults <- vector(mode = "list", length = ncol(df))
   for(j in 1:ncol(df)){
     td <- treedata(tree, data[,j], sort = TRUE)
-    #td$phy$node.label <- 
+    td$phy$node.label <- c(rep(1,41), rep(2,3), rep(1,7)) 
     fitBM <- fitContinuous(td$phy, td$data, model = "BM")
     fitOU <- fitContinuous(td$phy, td$data, model = "OU")
     fitEB <- fitContinuous(td$phy, td$data, model = "EB")
-    OUwie_df <- daf %>% mutate(X = (data[,j]))
-    fitBMS <- tryCatch(OUwie(phy, OUwie_df, model = "BMS"), error = function(x)list(AIC = Inf))
+    OUwie_df <- daf %>% mutate(X = (td$data))
+    fitBMS <- tryCatch(OUwie(td$phy, OUwie_df, model = "BMS"), error = function(x)list(AIC = Inf))
     aic <- c(fitBM$opt[["aic"]], fitOU$opt[["aic"]], fitEB$opt[["aic"]], fitBMS$AIC)
     fit <- ifelse(min(aic) == aic[1], list(c(fitBM, model = "BM")), 
                   ifelse(min(aic) == aic[2], list(c(fitOU, model = "OU")), 
