@@ -220,3 +220,50 @@ phylogeny is an average and summation of the relationships between all
 the genes, it is often a “close enough” tree, but for genes that do not
 fully follow the relationship at the species level, their data is often
 misrepresented.
+
+## Many Data Sets Show Model Inadequacy For Rate Heterogeneity
+
+While the best-fit model for some data sets has been shown to be highly
+adequate, many of the other data sets in this analysis showed similar
+patterns in where the best-fit models tended to fail.
+
+![](https://raw.githubusercontent.com/pennell-lab-ubc/fiels_workbench/main/fishes/arbutus/plots/arbutus_all.png?token=GHSAT0AAAAAABQNENDVRWBTSYGA3OJ3I3X2YUOQZFA)
+
+![](https://raw.githubusercontent.com/pennell-lab-ubc/fiels_workbench/main/cichlids/arbutus/arbutus_brain_1_prot.png?token=GHSAT0AAAAAABQNENDVWNG3CQHWU2QWEGRQYUOQ6BQ)
+
+**Figure 9. P-value Distributions of Arbutus Test Statistics for
+Extremophile Fishes Data Set (top) and Cichlids Data Set (bottom).**
+Inadequacies are seen in all test statistics except for d.cdf, but most
+notably in c.var and s.asr for extremophile fishes, whereas the cichlids
+data set shows inadequacies in mainly c.var, d.cdf, and s.asr.
+
+In general, the most commonly violated test statistics are the
+coefficient of variation (c.var) and the statistic of ancestral state
+reconstruction (s.asr). These test statistics both tend to be violated
+together, and are both in some way related to heterogeneity in
+evolutionary rate over the tree. Going back to Figure 1, the models in
+which they are both violated are models with multiple rates (MV and
+MVA). The simplest multi-rate model is the BMS, or multiple rate BM
+model, so I ran simulations to see what p-value distributions would look
+like if the true model were multirate BM, and the other tree models were
+fit over the model.
+
+![](https://raw.githubusercontent.com/pennell-lab-ubc/fiels_workbench/main/Arbutus_Exploration/Figures/multirate_violins.png?token=GHSAT0AAAAAABQNENDV3G5T6NDI3BWELPXWYUOREYA)
+
+**Figure 10. P value Distributions of Each Test Statistic When the True
+Model is BMS.** The fitted models are listed in the legend to the side.
+Both C.var and S.asr show clusters of low pvalues when the fitted model
+is any other model than BMS.
+
+As shown by the simulation, fitting models with one evolutionary rate
+regime (BM, OU, EB) to a truly multi-rate process would also generate
+high inadequacies in the C.var and S.asr test statistics. I then tested
+the addition of a BMS process to the Arbutus Analysis on multiple data
+sets.
+
+![](https://raw.githubusercontent.com/pennell-lab-ubc/fiels_workbench/main/fishes/Analysis_files/figure-gfm/unnamed-chunk-5-1.png?token=GHSAT0AAAAAABQNENDUPUBQWJGHFGHIT6VGYUORIZQ)
+
+**Figure 11. Addition of the BMS model lowers adequacy violations in
+C.var and S.asr.**
+
+![](https://raw.githubusercontent.com/pennell-lab-ubc/fiels_workbench/main/fishes/Analysis_files/figure-gfm/unnamed-chunk-2-1.png?token=GHSAT0AAAAAABQNENDV7PDNOGZSY5723FO2YUORJTQ)
