@@ -102,9 +102,9 @@ Ornstein-Uhlenbeck model and in the absolute sense, test statistics show
 wide distributions; suggesting adequacy of the model in all 5 aspects.
 The adequacy analyses are shown below.
 
-![A](https://raw.githubusercontent.com/fieldima/amalgam_data/main/arbutus/AIC/AIC_brain.png?token=GHSAT0AAAAAABQNENDVUJRRGMNCAXARN5BKYUNNAVQ)
+![A](https://raw.githubusercontent.com/fieldima/amalgam_data/main/arbutus/AIC/AIC_brain.png?token=GHSAT0AAAAAABQNENDU6GBLSVL4ON6GZSAUYUOQWVQ)
 
-![](https://raw.githubusercontent.com/fieldima/amalgam_data/3d3e2a1ac1657407cc8ee9e33aa7446b3edd2abe/arbutus/figures/arbutus_brain.png?token=GHSAT0AAAAAABQNENDUSM3S7VKLNOO24FDUYUNNACA)
+![](https://raw.githubusercontent.com/fieldima/amalgam_data/main/arbutus/figures/arbutus_brain.png?token=GHSAT0AAAAAABQNENDV6ZVCVMAWEX2UVTWUYUOQXAA)
 
 **Figure 2. Relative Fit of the three tested models (top) and Absolute
 Fit of the best-fit model (bottom) for Amalgamated Data.** The bulk of
@@ -164,4 +164,59 @@ studies was the usage of a species phylogenetic tree in the case of the
 Coevolution data set, in contrast to gene-family phylogenies in the
 comparative expression data. To uncover if this adequacy difference was
 due to the difference in methodologies; I, along with Doris Wu,
-re-analyzed the Coevolution data set with gene-family phylogenies.
+re-analyzed the Coevolution data set substituting the species
+relationships with gene-family phylogenies, so that each group of genes
+was described by the relationship between those genes. The generation of
+the gene family phylogenetic trees is described in this
+[repository](https://github.com/pennell-lab-ubc/gene-phylogeny-pipeline).
+The summary of the arbutus analysis of this data set is shown below.
+
+![](https://raw.githubusercontent.com/pennell-lab-ubc/gene-phylogeny-pipeline/main/adequacy_summary_chosen_genes.png?token=GHSAT0AAAAAABQNENDVS7VFWYUVR6X2TFJIYUOQVZA)
+
+**Figure 6. Inadequacies Found When Using Gene Family Phylogenies.**
+There are more inadequate genes across the board, but less NA values.
+
+This comparison was also carried out in the Mammal Organs data set. The
+p-value distributions for the test statistics are displayed below.
+
+    ## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
+
+    ## Warning: Removed 4297 rows containing non-finite values (stat_bin).
+
+![](Overall_Analysis_files/figure-gfm/unnamed-chunk-2-1.png)<!-- -->
+
+**Figure 7. Comparison of Test Statistic Distributions When Using Gene
+Family Phylogenies vs Species Phylogenies in Analyzing Adequacy of
+Mammal Organs Expression Data.** The inadequacies seen in c.var and
+s.asr appear to be higher when using species phylogenetic relationships,
+but inadequacies in s.var and s.hgt increase when using gene family
+phylogenies.
+
+As shown by the figure above, inadequacies increase in certain aspects,
+but decrease in others. Interestingly, using a species phylogeny seems
+to cause many genes to show no phylogenetic signal; shown by the drop
+off in p values near the low end for s.hgt, which was also seen in the
+Coevolution data set. This was confirmed in the Coevolution data set to
+be due to low phylogenetic signal in the plot below.
+
+![](https://raw.githubusercontent.com/fieldima/GeneExpression_coevolution/master/phylosig_all.png)
+
+**Figure 8. Phylogenetic Signal of Genes with NA Values in the S.hgt
+statistic have Low Phylogenetic Signal.** The K value describes
+phylogenetic signal where higher values indicate higher signal and the
+p-values are the result of a hypothesis test where p-values of 0.05 are
+genes with phylogenetic signal.
+
+In contrast, using gene family phylogenies in analysis causes genes that
+have no phylogenetic signal when using a species phylogeny to have
+signal, but they are inadequate in the S.hgt statistic. This statistic
+shows inadequacies when trait variation over time is not accounted for.
+
+Together, this suggests that using a species phylogeny can allow the
+best-fit model to describe the data better statistically, but at the
+expense of the phylogenetic signal of many genes, which may carry
+real-world data relevance consequences. In essence, because the species
+phylogeny is an average and summation of the relationships between all
+the genes, it is often a “close enough” tree, but for genes that do not
+fully follow the relationship at the species level, their data is often
+misrepresented.
