@@ -102,9 +102,9 @@ Ornstein-Uhlenbeck model and in the absolute sense, test statistics show
 wide distributions; suggesting adequacy of the model in all 5 aspects.
 The adequacy analyses are shown below.
 
-![A](https://raw.githubusercontent.com/fieldima/amalgam_data/main/arbutus/AIC/AIC_brain.png?token=GHSAT0AAAAAABQNENDU6GBLSVL4ON6GZSAUYUOQWVQ)
+![A](Overall_Analysus_Plots/figure2a.png)
 
-![](https://raw.githubusercontent.com/fieldima/amalgam_data/main/arbutus/figures/arbutus_brain.png?token=GHSAT0AAAAAABQNENDV6ZVCVMAWEX2UVTWUYUOQXAA)
+![](Overall_Analysus_Plots/figure2b.png)
 
 **Figure 2. Relative Fit of the three tested models (top) and Absolute
 Fit of the best-fit model (bottom) for Amalgamated Data.** The bulk of
@@ -127,7 +127,7 @@ species. I then performed arbutus analysis of the expression data after
 fitting to a BM model to see how well the model explains the variation
 in the data. A summary of the analysis is shown below.
 
-![](https://raw.githubusercontent.com/fieldima/GeneExpression_coevolution/master/BM_summary_chosen.png)
+![](Overall_Analysus_Plots/figure3.png)
 
 **Figure 3. Number of genes by number of inadequacies (cut off of 0.05)
 across test statistics for Coevolution data set.** Just over half of the
@@ -137,7 +137,7 @@ inadequate in all test statistics.
 I then performed relative fit analysis to see if there were models that
 explained the data better, with my results shown below.
 
-![](https://raw.githubusercontent.com/fieldima/GeneExpression_coevolution/master/only_BM_allfit_AIC.png)
+![](Overall_Analysus_Plots/figure4.png)
 
 **Figure 4. Count of the model with the lowest AIC value for each gene
 in the Coevolution data set.** The OU model is overwhelmingly supported
@@ -146,7 +146,7 @@ by the data.
 Finally, I performed arbutus analysis on the best fit model for each
 gene.
 
-![](https://raw.githubusercontent.com/fieldima/GeneExpression_coevolution/master/bestfit_summary_chosengenes.png)
+![](Overall_Analysus_Plots/figure5.png)
 
 **Figure 5. Number of genes by number of inadequacies (cut off of 0.05)
 across test statistics for Coevolution data set when using the best fit
@@ -171,7 +171,7 @@ the gene family phylogenetic trees is described in this
 [repository](https://github.com/pennell-lab-ubc/gene-phylogeny-pipeline).
 The summary of the arbutus analysis of this data set is shown below.
 
-![](https://raw.githubusercontent.com/pennell-lab-ubc/gene-phylogeny-pipeline/main/adequacy_summary_chosen_genes.png?token=GHSAT0AAAAAABQNENDVS7VFWYUVR6X2TFJIYUOQVZA)
+![](Overall_Analysus_Plots/figure6.png)
 
 **Figure 6. Inadequacies Found When Using Gene Family Phylogenies.**
 There are more inadequate genes across the board, but less NA values.
@@ -199,7 +199,7 @@ off in p values near the low end for s.hgt, which was also seen in the
 Coevolution data set. This was confirmed in the Coevolution data set to
 be due to low phylogenetic signal in the plot below.
 
-![](https://raw.githubusercontent.com/fieldima/GeneExpression_coevolution/master/phylosig_all.png)
+![](Overall_Analysus_Plots/figure8.png)
 
 **Figure 8. Phylogenetic Signal of Genes with NA Values in the S.hgt
 statistic have Low Phylogenetic Signal.** The K value describes
@@ -227,9 +227,9 @@ While the best-fit model for some data sets has been shown to be highly
 adequate, many of the other data sets in this analysis showed similar
 patterns in where the best-fit models tended to fail.
 
-![](https://raw.githubusercontent.com/pennell-lab-ubc/fiels_workbench/main/fishes/arbutus/plots/arbutus_all.png?token=GHSAT0AAAAAABQNENDVRWBTSYGA3OJ3I3X2YUOQZFA)
+![](Overall_Analysus_Plots/figure9a.png)
 
-![](https://raw.githubusercontent.com/pennell-lab-ubc/fiels_workbench/main/cichlids/arbutus/arbutus_brain_1_prot.png?token=GHSAT0AAAAAABQNENDVWNG3CQHWU2QWEGRQYUOQ6BQ)
+![](Overall_Analysus_Plots/figure9b.png)
 
 **Figure 9. P-value Distributions of Arbutus Test Statistics for
 Extremophile Fishes Data Set (top) and Cichlids Data Set (bottom).**
@@ -248,7 +248,7 @@ model, so I ran simulations to see what p-value distributions would look
 like if the true model were multirate BM, and the other tree models were
 fit over the model.
 
-![](https://raw.githubusercontent.com/pennell-lab-ubc/fiels_workbench/main/Arbutus_Exploration/Figures/multirate_violins.png?token=GHSAT0AAAAAABQNENDV3G5T6NDI3BWELPXWYUOREYA)
+![](Arbutus_Exploration/Figures/multirate_comparison.png)
 
 **Figure 10. P value Distributions of Each Test Statistic When the True
 Model is BMS.** The fitted models are listed in the legend to the side.
@@ -261,9 +261,9 @@ high inadequacies in the C.var and S.asr test statistics. I then tested
 the addition of a BMS process to the Arbutus Analysis on multiple data
 sets.
 
-![](https://raw.githubusercontent.com/pennell-lab-ubc/fiels_workbench/main/fishes/Analysis_files/figure-gfm/unnamed-chunk-5-1.png?token=GHSAT0AAAAAABQNENDUPUBQWJGHFGHIT6VGYUORIZQ)
+![](Overall_Analysus_Plots/figure11.png)
 
 **Figure 11. Addition of the BMS model lowers adequacy violations in
 C.var and S.asr.**
 
-![](https://raw.githubusercontent.com/pennell-lab-ubc/fiels_workbench/main/fishes/Analysis_files/figure-gfm/unnamed-chunk-2-1.png?token=GHSAT0AAAAAABQNENDV7PDNOGZSY5723FO2YUORJTQ)
+![](Overall_Analysus_Plots/figure12.png)
