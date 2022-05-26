@@ -48,9 +48,9 @@ C.var is the coefficient of variation, used to test if rate heterogeneity is acc
 
 Based on my analysis there is evidence supporting the usage of the models mentioned above, specifically the OU model. The amalgamated data set is the largest data set showing support for the models above. This is an amalgamation of 1903 RNA Seq studies with 6 organs and 21 vertebrate species. In a relative sense, the data was best fit by the Ornstein-Uhlenbeck model and in the absolute sense, test statistics show wide distributions; suggesting adequacy of the model in all 5 aspects. The adequacy analyses are shown below.
 
-![A](https://raw.githubusercontent.com/fieldima/amalgam_data/main/arbutus/AIC/AIC_brain.png?token=GHSAT0AAAAAABQNENDU6GBLSVL4ON6GZSAUYUOQWVQ)
+![A](Overall_Analysus_Plots/figure2a.png)
 
-![](https://raw.githubusercontent.com/fieldima/amalgam_data/main/arbutus/figures/arbutus_brain.png?token=GHSAT0AAAAAABQNENDV6ZVCVMAWEX2UVTWUYUOQXAA)
+![](Overall_Analysus_Plots/figure2b.png)
 
 **Figure 2. Relative Fit of the three tested models (top) and Absolute Fit of the best-fit model (bottom) for Amalgamated Data.** The bulk of the data was best fit by an Ornstein-Uhlenbeck process. The adequacy of the best fit model for each gene was high across the tested statistics, with evenly distributed test statistics across the board.
 
@@ -58,19 +58,19 @@ As shown by Figure 2, the amalgamated data set showed high adequacy for the best
 
 One of the goals of this analysis was to identify models that may describe gene expression data better in the context of phylogenetic comparative analysis. In the "Coevolution" data set, the author used a BM model to identify evidence of coevolution of proteins across 18 fungi species. I then performed arbutus analysis of the expression data after fitting to a BM model to see how well the model explains the variation in the data. A summary of the analysis is shown below.
 
-![](https://raw.githubusercontent.com/fieldima/GeneExpression_coevolution/master/BM_summary_chosen.png)
+![](Overall_Analysus_Plots/figure3.png)
 
 **Figure 3. Number of genes by number of inadequacies (cut off of 0.05) across test statistics for Coevolution data set.** Just over half of the data is adequately modeled by a BM process, with some of the genes being inadequate in all test statistics.
 
 I then performed relative fit analysis to see if there were models that explained the data better, with my results shown below.
 
-![](https://raw.githubusercontent.com/fieldima/GeneExpression_coevolution/master/only_BM_allfit_AIC.png)
+![](Overall_Analysus_Plots/figure4.png)
 
 **Figure 4. Count of the model with the lowest AIC value for each gene in the Coevolution data set.** The OU model is overwhelmingly supported by the data.
 
 Finally, I performed arbutus analysis on the best fit model for each gene.
 
-![](https://raw.githubusercontent.com/fieldima/GeneExpression_coevolution/master/bestfit_summary_chosengenes.png)
+![](Overall_Analysus_Plots/figure5.png)
 
 **Figure 5. Number of genes by number of inadequacies (cut off of 0.05) across test statistics for Coevolution data set when using the best fit model.** Genes across the board show great decreases in overall inadequacy.
 
@@ -78,7 +78,7 @@ Finally, I performed arbutus analysis on the best fit model for each gene.
 
 One interesting finding from the analysis of the Coevolution data set was just how adequate the data was compared to data analyzed in previous studies. A previous analysis found current models to be quite inadequate to describe gene expression data. This analysis is recreated in the Comparative Expression repository. One major difference between these studies was the usage of a species phylogenetic tree in the case of the Coevolution data set, in contrast to gene-family phylogenies in the comparative expression data. To uncover if this adequacy difference was due to the difference in methodologies; I, along with Doris Wu, re-analyzed the Coevolution data set substituting the species relationships with gene-family phylogenies, so that each group of genes was described by the relationship between those genes. The generation of the gene family phylogenetic trees is described in this [repository](https://github.com/pennell-lab-ubc/gene-phylogeny-pipeline). The summary of the arbutus analysis of this data set is shown below.
 
-![](https://raw.githubusercontent.com/pennell-lab-ubc/gene-phylogeny-pipeline/main/adequacy_summary_chosen_genes.png?token=GHSAT0AAAAAABQNENDVS7VFWYUVR6X2TFJIYUOQVZA)
+![](Overall_Analysus_Plots/figure6.png)
 
 **Figure 6. Inadequacies Found When Using Gene Family Phylogenies.** There are more inadequate genes across the board, but less NA values.
 
@@ -104,7 +104,7 @@ to_plot %>% ggplot(aes(x = pvalue)) + geom_histogram() + facet_grid(rows = vars(
 
 As shown by the figure above, inadequacies increase in certain aspects, but decrease in others. Interestingly, using a species phylogeny seems to cause many genes to show no phylogenetic signal; shown by the drop off in p values near the low end for s.hgt, which was also seen in the Coevolution data set. This was confirmed in the Coevolution data set to be due to low phylogenetic signal in the plot below.
 
-![](https://raw.githubusercontent.com/fieldima/GeneExpression_coevolution/master/phylosig_all.png)
+![](Overall_Analysus_Plots/figure8.png)
 
 **Figure 8. Phylogenetic Signal of Genes with NA Values in the S.hgt statistic have Low Phylogenetic Signal.** The K value describes phylogenetic signal where higher values indicate higher signal and the p-values are the result of a hypothesis test where p-values of 0.05 are genes with phylogenetic signal.
 
@@ -116,9 +116,9 @@ Together, this suggests that using a species phylogeny can allow the best-fit mo
 
 While the best-fit model for some data sets has been shown to be highly adequate, many of the other data sets in this analysis showed similar patterns in where the best-fit models tended to fail.
 
-![](https://raw.githubusercontent.com/pennell-lab-ubc/fiels_workbench/main/fishes/arbutus/plots/arbutus_all.png?token=GHSAT0AAAAAABQNENDVRWBTSYGA3OJ3I3X2YUOQZFA)
+![](Overall_Analysus_Plots/figure9a.png)
 
-![](https://raw.githubusercontent.com/pennell-lab-ubc/fiels_workbench/main/cichlids/arbutus/arbutus_brain_1_prot.png?token=GHSAT0AAAAAABQNENDVWNG3CQHWU2QWEGRQYUOQ6BQ)
+![](Overall_Analysus_Plots/figure9b.png)
 
 **Figure 9. P-value Distributions of Arbutus Test Statistics for Extremophile Fishes Data Set (top) and Cichlids Data Set (bottom).** Inadequacies are seen in all test statistics except for d.cdf, but most notably in c.var and s.asr for extremophile fishes, whereas the cichlids data set shows inadequacies in mainly c.var, d.cdf, and s.asr.
 
@@ -135,3 +135,7 @@ As shown by the simulation, fitting models with one evolutionary rate regime (BM
 **Figure 11. Addition of the BMS model lowers adequacy violations in C.var and S.asr.**
 
 ![](https://raw.githubusercontent.com/pennell-lab-ubc/fiels_workbench/main/fishes/Analysis_files/figure-gfm/unnamed-chunk-2-1.png?token=GHSAT0AAAAAABQNENDV7PDNOGZSY5723FO2YUORJTQ)
+
+![![](https://raw.githubusercontent.com/pennell-lab-ubc/fiels_workbench/main/fishes/Analysis_files/figure-gfm/unnamed-chunk-2-2.png?token=GHSAT0AAAAAABQNENDV2XBB37HE6LPTZODUYUORJWQ)](null)
+
+![](https://raw.githubusercontent.com/pennell-lab-ubc/fiels_workbench/main/fishes/Analysis_files/figure-gfm/unnamed-chunk-2-2.png?token=GHSAT0AAAAAABQNENDV2XBB37HE6LPTZODUYUORJWQ)
