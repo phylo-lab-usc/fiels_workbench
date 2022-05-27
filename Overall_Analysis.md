@@ -281,6 +281,10 @@ analysis.
 Genes with No Inadequacies in Extremophile Fish Data.** Genes with 3 or
 more inadequacies showed little change with the addition of a BMS model.
 
+This same pattern of increasing the proportion of genes with fully
+adequate models by mainly decreasing inadequacies in C.var and S.asr was
+also seen in the Interspecific RNA Seq data set.
+
 One issue with using a model with multiple evolutionary rates is the
 need to pre-define selective regimes. This means that one would have to
 have some biological question or knowledge specific to a set of taxa.
