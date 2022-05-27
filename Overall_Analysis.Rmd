@@ -110,7 +110,7 @@ As shown by the figure above, inadequacies increase in certain aspects, but decr
 
 In contrast, using gene family phylogenies in analysis causes genes that have no phylogenetic signal when using a species phylogeny to have signal, but they are inadequate in the S.hgt statistic. This statistic shows inadequacies when trait variation over time is not accounted for.
 
-Together, this suggests that using a species phylogeny can allow the best-fit model to describe the data better statistically, but at the expense of the phylogenetic signal of many genes, which may carry real-world data relevance consequences. In essence, because the species phylogeny is an average and summation of the relationships between all the genes, it is often a "close enough" tree, but for genes that do not fully follow the relationship at the species level, their data is often misrepresented.
+Together, it seems that using gene family phylogenies over species phylogenies increases the amount of inadequacies in a set of data, but this increase may be only due to NA values showing up as inadequate p-values. This suggests that using a species phylogeny can allow the best-fit model to describe the data better statistically (for genes not thrown out for NA p values), but at the expense of the phylogenetic signal of many genes, which may decrease the ability to make biological inferences. In essence, because the species phylogeny is an average and summation of the relationships between all the genes, it is often a "close enough" tree, but for genes that do not fully follow the relationship at the species level, the model that describes their evolution may be misleading.
 
 ## Many Data Sets Show Model Inadequacy For Rate Heterogeneity
 
@@ -122,16 +122,34 @@ While the best-fit model for some data sets has been shown to be highly adequate
 
 **Figure 9. P-value Distributions of Arbutus Test Statistics for Extremophile Fishes Data Set (top) and Cichlids Data Set (bottom).** Inadequacies are seen in all test statistics except for d.cdf, but most notably in c.var and s.asr for extremophile fishes, whereas the cichlids data set shows inadequacies in mainly c.var, d.cdf, and s.asr.
 
-In general, the most commonly violated test statistics are the coefficient of variation (c.var) and the statistic of ancestral state reconstruction (s.asr). These test statistics both tend to be violated together, and are both in some way related to heterogeneity in evolutionary rate over the tree. Going back to Figure 1, the models in which they are both violated are models with multiple rates (MV and MVA). The simplest multi-rate model is the BMS, or multiple rate BM model, so I ran simulations to see what p-value distributions would look like if the true model were multirate BM, and the other tree models were fit over the model.
+In general, the most commonly violated test statistics are the coefficient of variation (c.var) and the statistic of ancestral state reconstruction (s.asr) as shown by Figure 7 and 9. These test statistics both tend to be violated together, and are both in some way related to heterogeneity in evolutionary rate over the tree. Going back to Figure 1, these test statistics are both violated when the true model has multiple rates, but the fitted model does not (MV and MVA). The simplest multi-rate model is the BMS, or multiple rate BM, so I ran simulations to see what p-value distributions would look like if the true model were multirate BM, and the other, single-rate models were fit.
 
 ![](Arbutus_Exploration/Figures/multirate_comparison.png)
 
 **Figure 10. P value Distributions of Each Test Statistic When the True Model is BMS.** The fitted models are listed in the legend to the side. Both C.var and S.asr show clusters of low pvalues when the fitted model is any other model than BMS.
 
-As shown by the simulation, fitting models with one evolutionary rate regime (BM, OU, EB) to a truly multi-rate process would also generate high inadequacies in the C.var and S.asr test statistics. I then tested the addition of a BMS process to the Arbutus Analysis on multiple data sets.
+As shown by the simulation, fitting models with one evolutionary rate regime (BM, OU, EB) to a truly multi-rate process would also generate high inadequacies in the C.var and S.asr test statistics, confirming this as a possible cause of inadequacies in data. I then tested the addition of a BMS process to the Arbutus Analysis process on multiple data sets.
 
 ![](Overall_Analysus_Plots/figure11.png)
 
-**Figure 11. Addition of the BMS model lowers adequacy violations in C.var and S.asr.**
+**Figure 11. Addition of the BMS model lowers adequacy violations in C.var and S.asr in Extremophile Fish data.** More violations are seen in the s.hgt statistic and s.var statistic when a BMS model is included in analysis.
 
 ![](Overall_Analysus_Plots/figure12.png)
+
+![](Overall_Analysus_Plots/figure12b.png)
+
+**Figure 12. Addition of a BMS Model to Analysis Increases the Amount of Genes with No Inadequacies in Extremophile Fish Data.** Genes with 3 or more inadequacies showed little change with the addition of a BMS model.
+
+One issue with using a model with multiple evolutionary rates is the need to pre-define selective regimes. This means that one would have to have some biological question or knowledge specific to a set of taxa. However, when broadly analyzing the adequacy of models themselves over the field, this leaves the problem of how to define evolutionary regimes to allow for comparison between data sets. In cases where the authors of the original study made inferences about evolutionary regimes, I simply used those. However, for data sets such as the Snake Venom and Cichlids data sets, I instead used the Motmot tool. This tool identifies clades that experience a shift in evolutionary rate through multiple hypothesis testing. The results of using motmot combined with Arbutus are shown below.
+
+![](Overall_Analysus_Plots/figure13.png)
+
+![](Overall_Analysus_Plots/figure13b.png)
+
+**Figure 13. Adequacy of the Best Fit Model for Snake Venom Data (top) and Cichlids Data (bottom) with and without inclusion of BMS models to Analysis.** Adequacy increased for snake venom genes, but no change was seen in cichlids data.
+
+Overall, the addition of multi-rate BM models to arbutus analysis did increase the adequacy of the best-fit model for the data. Specifically, it decreased issues with C.var and S.asr, which both detect violations when there are issues with evolutionary rate heterogeneity across a tree. However, the magnitude of this increase ranges from moderate (Figure 12) to very little (Figure 13). Thus, factors other than rate heterogeneity seem to be coming into play that is causing models to be inadequate even with the addition of a model that allows for multiple evolutionary rates. Early Burst models were shown to be violated in this test statistic as well (Figure 1), suggesting that one of these factors may be "static" evolutionary rates that are seen in all the models used except for EB.
+
+## Conclusion
+
+Model adequacy is the ability of a model to explain the variation seen in a set of data. More adequate models allow researchers to make better predictions about some statistical process. In this case, the models we are using are proxies for evolutionary processes such as neutral drift, adaptive selection, divergent evolution, etc. Phylogenetic Comparative Methods rely on such models to make claims about the evolution of organisms, but these methods have not been extensively evaluated in the context of gene expression data. In this analysis I have shown that of the three models widely used in the field today, the Ornstein-Uhlenbeck model tends to be the best-fit model for much of the data in a relative sense. In an absolute sense, the results are mixed. For data sets that use a species phylogeny as the basis, the model does a relatively adequate job. While this is good news statistically, the adequacy of this model tends to decrease a fair amount when a more accurate gene family phylogeny is used for each gene studied. This suggests that using a species phylogeny may allow the current models to perform well statistically, it may decrease the predictive power or ability for biological inference. Additionally, when these models do fail, they tend to be related to issues with heterogeneity in evolutionary rate. Simulation data showed that fitting data that is truly multi-rate with a single rate model recreated these patterns. Addition of a multi-rate model to analysis did somewhat alleviate the inadequacies with rate heterogeneity, but it did not eliminate them. Therefore, other factors may be at play. These factors may include differences in gene expression normalization, static evolutionary rates, batch effects, etc. I suggest that models that account for intraspecific variation, such as the EvoGeneX modified OU model, may further alleviate such model inadequacies, allowing researchers to make better inferences on evolutionary data.
